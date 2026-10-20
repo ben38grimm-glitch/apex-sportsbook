@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Apex Sportsbook | Live NFL & NBA Odds</title>
+  <title>Apex Sportsbook | NFL, NBA & EPL Odds</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -44,13 +44,13 @@
 <body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-green selection:text-black">
 
   <!-- TOP LIVE SCORES TICKER -->
-  <div class="bg-black/80 border-b border-brand-border/60 py-1.5 px-4 overflow-x-auto text-[11px] whitespace-nowrap scrollbar-none flex items-center gap-6" id="liveTickerBar">
+  <div class="bg-black/90 border-b border-brand-border/60 py-1.5 px-4 overflow-x-auto text-[11px] whitespace-nowrap scrollbar-none flex items-center gap-6" id="liveTickerBar">
     <div class="flex items-center gap-1.5 text-brand-green font-bold shrink-0">
       <span class="w-2 h-2 rounded-full bg-brand-green live-pulse"></span>
-      <span>LIVE FEED</span>
+      <span>LIVE TICKER</span>
     </div>
     <div id="tickerItems" class="flex items-center gap-6 text-slate-300 font-medium">
-      <span>Connecting to live ESPN / DraftKings stream...</span>
+      <span>Connecting to live ESPN & DraftKings feed...</span>
     </div>
   </div>
 
@@ -70,10 +70,11 @@
 
       <!-- Sports Nav Tabs (Desktop) -->
       <nav class="hidden md:flex items-center gap-1 bg-brand-dark p-1 rounded-xl border border-brand-border/80 text-xs font-semibold text-slate-300">
-        <button onclick="setSportFilter('ALL')" class="px-3.5 py-1.5 rounded-lg transition sport-nav-btn active-nav" id="nav-ALL">All Matches</button>
-        <button onclick="setSportFilter('NFL')" class="px-3.5 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NFL">🏈 NFL</button>
-        <button onclick="setSportFilter('NBA')" class="px-3.5 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NBA">🏀 NBA</button>
-        <button onclick="setSportFilter('LIVE')" class="px-3.5 py-1.5 rounded-lg transition sport-nav-btn text-red-400 flex items-center gap-1.5" id="nav-LIVE">
+        <button onclick="setSportFilter('ALL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn active-nav bg-brand-card text-brand-green font-bold" id="nav-ALL">All Matches</button>
+        <button onclick="setSportFilter('NFL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NFL">🏈 NFL</button>
+        <button onclick="setSportFilter('NBA')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NBA">🏀 NBA</button>
+        <button onclick="setSportFilter('EPL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-EPL">⚽ EPL</button>
+        <button onclick="setSportFilter('LIVE')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn text-red-400 flex items-center gap-1.5" id="nav-LIVE">
           <span class="w-2 h-2 rounded-full bg-red-500 live-pulse"></span> In-Play
         </button>
       </nav>
@@ -81,16 +82,16 @@
 
     <!-- WALLET & BETSLIP ACTIONS -->
     <div class="flex items-center gap-3">
-      <!-- Sync Button -->
-      <button onclick="fetchLiveOdds(true)" id="refreshBtn" title="Refresh Live Odds" class="hidden sm:flex items-center gap-1.5 bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+      <!-- Refresh Odds Button -->
+      <button onclick="fetchLiveOdds(true)" id="refreshBtn" title="Refresh Odds" class="hidden sm:flex items-center gap-1.5 bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
         <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
-        <span id="refreshLabel">Sync</span>
+        <span>Sync</span>
       </button>
 
       <!-- Mock Wallet Balance -->
       <div class="bg-brand-card border border-brand-border px-3.5 py-1.5 rounded-xl flex items-center gap-2.5 shadow-inner">
         <div class="text-right">
-          <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Available</div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Balance</div>
           <div id="userBalance" class="font-extrabold text-brand-green text-sm">$2,500.00</div>
         </div>
         <button onclick="depositFunds()" class="bg-brand-green hover:bg-emerald-400 text-black font-extrabold text-xs px-2.5 py-1 rounded-lg transition shadow-sm">
@@ -117,11 +118,11 @@
       <div class="mb-6 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-brand-card to-slate-900 p-5 border border-brand-green/30 relative overflow-hidden shadow-2xl">
         <div class="relative z-10 max-w-xl">
           <div class="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/30 text-brand-green text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-            <span>Live ESPN & DraftKings API Connected</span>
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>Active & Upcoming Games Only</span>
           </div>
-          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">NFL & NBA Prime-Time Board</h2>
-          <p class="text-xs text-slate-300 mt-1">Real-time point spreads, moneyline, over/under lines, and live scores updated straight from official streams.</p>
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">NFL, NBA & Premier League Board</h2>
+          <p class="text-xs text-slate-300 mt-1">Live in-play matches and upcoming scheduled games with official DraftKings odds.</p>
         </div>
       </div>
 
@@ -130,7 +131,7 @@
         <!-- Team Search -->
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams (e.g. Chiefs, Lakers, Celtics)..."
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams (e.g. Chiefs, Lakers, Arsenal, Chelsea)..."
             class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-green transition" />
         </div>
 
@@ -139,15 +140,16 @@
           <button onclick="setSportFilter('ALL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap active-chip">All</button>
           <button onclick="setSportFilter('NFL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap">🏈 NFL</button>
           <button onclick="setSportFilter('NBA')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap">🏀 NBA</button>
+          <button onclick="setSportFilter('EPL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap">⚽ EPL</button>
           <button onclick="setSportFilter('LIVE')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap text-red-400">🔴 Live</button>
         </div>
       </div>
 
       <!-- MATCH ODDS TABLE HEADER -->
       <div class="flex items-center justify-between mb-2.5 text-[11px] text-slate-400 font-extrabold uppercase tracking-wider px-3">
-        <span id="activeSectionTitle">MATCHUP</span>
+        <span id="activeSectionTitle">MATCHUP & TIME</span>
         <div class="hidden sm:grid grid-cols-3 gap-2 w-80 text-center">
-          <span>SPREAD</span>
+          <span>SPREAD / HC</span>
           <span>MONEYLINE</span>
           <span>TOTAL</span>
         </div>
@@ -285,23 +287,58 @@
       return num > 0 ? `+${num}` : `${num}`;
     }
 
-    // FETCH LIVE ESPN & DRAFTKINGS DATA
+    // FORMAT DATE DISPLAY
+    function formatMatchTime(isoString, shortDetail) {
+      if (!isoString) return shortDetail || "Scheduled";
+      try {
+        const d = new Date(isoString);
+        return d.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' }) + 
+               " • " + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      } catch (e) {
+        return shortDetail || "Upcoming";
+      }
+    }
+
+    // FETCH LIVE ESPN & DRAFTKINGS DATA (EXCLUDING COMPLETED GAMES)
     async function fetchLiveOdds(isManual = false) {
       const refreshIcon = document.getElementById("refreshIcon");
       if (refreshIcon) refreshIcon.classList.add("animate-spin");
 
       try {
-        const [nflRes, nbaRes] = await Promise.all([
+        // Fetch NFL, NBA, and English Premier League (EPL)
+        const [nflInit, nbaRes, eplRes] = await Promise.all([
           fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard").then(r => r.json()).catch(() => null),
-          fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => r.json()).catch(() => null)
+          fetch("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard").then(r => r.json()).catch(() => null),
+          fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard").then(r => r.json()).catch(() => null)
         ]);
+
+        let nflRes = nflInit;
+        // If current NFL week has no remaining upcoming games, fetch the upcoming week!
+        if (nflInit && nflInit.events) {
+          const hasUpcomingNFL = nflInit.events.some(e => !e.status?.type?.completed && e.status?.type?.state !== 'post');
+          if (!hasUpcomingNFL) {
+            const nextWeek = (nflInit.week?.number || 7) + 1;
+            const nextWeekRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?week=${nextWeek}&seasontype=2`).then(r => r.json()).catch(() => null);
+            if (nextWeekRes && nextWeekRes.events) {
+              nflRes = nextWeekRes;
+            }
+          }
+        }
 
         const parsed = [];
 
-        // Helper to parse ESPN events
+        // Helper to parse games and STRICTLY FILTER OUT COMPLETED GAMES
         const processLeague = (data, sport) => {
           if (!data || !data.events) return;
           data.events.forEach(event => {
+            // STRICT FILTER: Only currently playing (state: 'in') or upcoming (state: 'pre')
+            const isCompleted = event.status?.type?.completed === true || 
+                                event.status?.type?.state === 'post' || 
+                                event.status?.type?.name === 'STATUS_FINAL';
+            if (isCompleted) {
+              return; // SKIP completed games!
+            }
+
             const comp = event.competitions && event.competitions[0];
             if (!comp) return;
 
@@ -310,27 +347,28 @@
             const oddsObj = comp.odds && comp.odds[0] ? comp.odds[0] : null;
 
             const isLive = event.status?.type?.state === 'in';
-            const isCompleted = event.status?.type?.completed;
-            const statusDetail = event.status?.type?.shortDetail || event.status?.type?.detail || "Scheduled";
+            const statusDetail = isLive 
+              ? (event.status?.type?.shortDetail || `${event.status?.displayClock || ''} Q${event.status?.period || ''}`)
+              : formatMatchTime(event.date, event.status?.type?.shortDetail);
 
-            // Extract DraftKings lines or sensible fallback
-            const spreadVal = oddsObj?.spread ?? (sport === 'NFL' ? 3.5 : 4.5);
-            const ouVal = oddsObj?.overUnder ?? (sport === 'NFL' ? 47.5 : 224.5);
+            // Extract DraftKings lines or sensible fallback based on sport
+            let defSpread = sport === 'NFL' ? 3.5 : (sport === 'NBA' ? 4.5 : 0.5);
+            let defTotal = sport === 'NFL' ? 47.5 : (sport === 'NBA' ? 224.5 : 2.5);
+
+            const spreadVal = oddsObj?.spread ?? defSpread;
+            const ouVal = oddsObj?.overUnder ?? defTotal;
 
             const awaySpreadLine = spreadVal > 0 ? `+${spreadVal}` : `${spreadVal}`;
             const homeSpreadLine = spreadVal > 0 ? `-${spreadVal}` : `+${Math.abs(spreadVal)}`;
 
-            const awayML = oddsObj?.awayTeamOdds?.moneyLine || oddsObj?.moneyline?.away?.close?.odds || (spreadVal > 0 ? "+145" : "-165");
-            const homeML = oddsObj?.homeTeamOdds?.moneyLine || oddsObj?.moneyline?.home?.close?.odds || (spreadVal > 0 ? "-165" : "+145");
+            const awayML = oddsObj?.awayTeamOdds?.moneyLine || oddsObj?.moneyline?.away?.close?.odds || (spreadVal > 0 ? "+135" : "-155");
+            const homeML = oddsObj?.homeTeamOdds?.moneyLine || oddsObj?.moneyline?.home?.close?.odds || (spreadVal > 0 ? "-155" : "+135");
 
             parsed.push({
               id: event.id,
               sport,
               isLive,
-              isCompleted,
               statusDetail,
-              clock: event.status?.displayClock,
-              period: event.status?.period,
               awayTeam: {
                 name: away.team.displayName || away.team.name,
                 shortName: away.team.shortDisplayName || away.team.abbreviation,
@@ -367,6 +405,7 @@
 
         processLeague(nflRes, "NFL");
         processLeague(nbaRes, "NBA");
+        processLeague(eplRes, "EPL");
 
         if (parsed.length > 0) {
           liveGames = parsed;
@@ -376,7 +415,7 @@
         updateTicker();
 
         if (isManual) {
-          showToast("Odds Synced", "Latest scores & DraftKings odds loaded.");
+          showToast("Odds Synced", "Active and upcoming games updated.");
         }
       } catch (err) {
         console.error("Failed to fetch odds:", err);
@@ -391,12 +430,12 @@
       if (!ticker || liveGames.length === 0) return;
 
       ticker.innerHTML = liveGames.slice(0, 8).map(g => `
-        <div class="flex items-center gap-2 cursor-pointer hover:text-white transition">
-          <span class="text-[10px] font-bold text-slate-400">${g.sport}</span>
+        <div class="flex items-center gap-2 cursor-pointer hover:text-white transition" onclick="setSportFilter('${g.sport}')">
+          <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-1.5 py-0.2 rounded">${g.sport}</span>
           <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.awayTeam.shortName} ${g.isLive ? g.awayTeam.score : ''}</span>
           <span class="text-slate-500">@</span>
           <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.homeTeam.shortName} ${g.isLive ? g.homeTeam.score : ''}</span>
-          <span class="text-[10px] text-slate-500 ml-1">(${g.statusDetail})</span>
+          <span class="text-[10px] ${g.isLive ? 'text-red-400 font-bold' : 'text-slate-400'}">(${g.statusDetail})</span>
         </div>
       `).join('');
     }
@@ -417,9 +456,9 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="bg-brand-card border border-brand-border rounded-2xl p-10 text-center text-slate-400">
-            <i data-lucide="calendar-x" class="w-8 h-8 mx-auto text-slate-600 mb-2"></i>
-            <p class="font-bold text-sm text-slate-300">No matchups found for this filter.</p>
-            <p class="text-xs text-slate-500 mt-1">Try selecting "All Matches" or clearing your search.</p>
+            <i data-lucide="calendar-clock" class="w-8 h-8 mx-auto text-slate-600 mb-2"></i>
+            <p class="font-bold text-sm text-slate-300">No active or upcoming games right now for this filter.</p>
+            <p class="text-xs text-slate-500 mt-1">Check back soon or choose another sport above.</p>
           </div>
         `;
         lucide.createIcons();
@@ -436,38 +475,40 @@
             <!-- Teams info & status -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-2 text-xs font-bold">
-                <span class="bg-brand-surface text-slate-300 px-2.5 py-0.5 rounded-full border border-brand-border text-[10px]">${game.sport}</span>
+                <span class="bg-brand-surface text-slate-300 px-2.5 py-0.5 rounded-full border border-brand-border text-[10px] font-black">${game.sport}</span>
                 ${game.isLive 
                   ? `<span class="bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full text-[10px] flex items-center gap-1 font-bold">
                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 live-pulse"></span> ${game.statusDetail}
                      </span>`
-                  : `<span class="text-slate-400 text-[11px]">${game.statusDetail}</span>`
+                  : `<span class="text-slate-400 text-[11px] font-medium flex items-center gap-1">
+                       <i data-lucide="clock" class="w-3 h-3 text-slate-500"></i> ${game.statusDetail}
+                     </span>`
                 }
               </div>
 
               <!-- Away Team -->
               <div class="flex items-center justify-between text-sm py-1 font-bold">
-                <div class="flex items-center gap-2.5">
-                  <img src="${game.awayTeam.logo}" alt="${game.awayTeam.name}" class="w-6 h-6 object-contain" />
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <img src="${game.awayTeam.logo}" alt="${game.awayTeam.name}" class="w-6 h-6 object-contain shrink-0" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo-500.png'" />
                   <span class="text-white truncate">${game.awayTeam.name}</span>
                 </div>
-                ${game.isLive ? `<span class="font-mono text-base text-brand-green font-black">${game.awayTeam.score}</span>` : ''}
+                ${game.isLive ? `<span class="font-mono text-base text-brand-green font-black ml-2">${game.awayTeam.score}</span>` : ''}
               </div>
 
               <!-- Home Team -->
               <div class="flex items-center justify-between text-sm py-1 font-bold">
-                <div class="flex items-center gap-2.5">
-                  <img src="${game.homeTeam.logo}" alt="${game.homeTeam.name}" class="w-6 h-6 object-contain" />
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <img src="${game.homeTeam.logo}" alt="${game.homeTeam.name}" class="w-6 h-6 object-contain shrink-0" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo-500.png'" />
                   <span class="text-white truncate">${game.homeTeam.name}</span>
                 </div>
-                ${game.isLive ? `<span class="font-mono text-base text-brand-green font-black">${game.homeTeam.score}</span>` : ''}
+                ${game.isLive ? `<span class="font-mono text-base text-brand-green font-black ml-2">${game.homeTeam.score}</span>` : ''}
               </div>
             </div>
 
             <!-- Odds Buttons Column -->
             <div class="grid grid-cols-3 gap-2 w-full sm:w-80 shrink-0">
               
-              <!-- SPREAD -->
+              <!-- SPREAD / HANDICAP -->
               <div class="flex flex-col gap-1.5">
                 <button onclick="toggleBetSelection('${game.id}', 'Spread', '${game.awayTeam.shortName} ${game.markets.spread.awayLine}', '${game.markets.spread.awayOdds}', '${game.awayTeam.shortName} @ ${game.homeTeam.shortName}')"
                   class="odds-btn bg-brand-surface hover:border-brand-green border border-brand-border p-2 rounded-xl text-xs flex justify-between items-center transition"
@@ -531,7 +572,6 @@
       if (existingIdx > -1) {
         betSlip.splice(existingIdx, 1);
       } else {
-        // Remove conflicting market for the same match
         const conflictIdx = betSlip.findIndex(b => b.gameId === gameId && b.market === market);
         if (conflictIdx > -1) {
           betSlip.splice(conflictIdx, 1);
@@ -540,7 +580,6 @@
         betSlip.push({ key: betKey, gameId, market, pick, odds, matchup });
       }
 
-      // Switch tab to Bet Slip automatically
       switchAsideTab('SLIP');
       updateBetSlipUI();
       highlightSelectedOdds();
@@ -641,7 +680,6 @@
       userBalance -= stake;
       saveBalance();
 
-      // Calculate payout
       let potentialReturn = 0;
       if (slipMode === "PARLAY") {
         let multi = 1;
@@ -653,7 +691,6 @@
         potentialReturn = total.toFixed(2);
       }
 
-      // Record placed bet
       const placedObj = {
         id: "BET-" + Date.now().toString(36).toUpperCase(),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -671,7 +708,6 @@
       showToast("Wager Placed!", `$${stake} placed on ${betSlip.length} pick(s).`);
       clearBetSlip();
 
-      // Automatically open "My Bets" view to see the placed wager
       switchAsideTab('MY_BETS');
       renderMyBets();
     }
@@ -796,17 +832,24 @@
 
     function setSportFilter(filter) {
       currentFilter = filter;
-      document.querySelectorAll(".sport-nav-btn").forEach(b => b.classList.remove("bg-brand-card", "text-brand-green"));
+      document.querySelectorAll(".sport-nav-btn").forEach(b => {
+        b.classList.remove("bg-brand-card", "text-brand-green", "font-bold");
+        b.classList.add("hover:text-white");
+      });
       const activeNav = document.getElementById(`nav-${filter}`);
-      if (activeNav) activeNav.classList.add("bg-brand-card", "text-brand-green");
+      if (activeNav) {
+        activeNav.classList.add("bg-brand-card", "text-brand-green", "font-bold");
+        activeNav.classList.remove("hover:text-white");
+      }
 
       const titleMap = {
-        'ALL': 'MATCHUP & LIVE ODDS',
+        'ALL': 'MATCHUP & SCHEDULE',
         'NFL': 'NFL FOOTBALL LINES',
         'NBA': 'NBA BASKETBALL LINES',
+        'EPL': 'PREMIER LEAGUE FIXTURES & ODDS',
         'LIVE': 'LIVE IN-PLAY GAMES'
       };
-      document.getElementById("activeSectionTitle").textContent = titleMap[filter] || 'MATCHUP';
+      document.getElementById("activeSectionTitle").textContent = titleMap[filter] || 'MATCHUP & SCHEDULE';
       renderGames();
     }
 
@@ -821,7 +864,7 @@
     }
 
     function depositFunds() {
-      const amt = prompt("Enter mock deposit amount ($):", "250");
+      const amt = prompt("Enter deposit amount ($):", "250");
       if (amt && !isNaN(amt) && parseFloat(amt) > 0) {
         userBalance += parseFloat(amt);
         saveBalance();
@@ -854,7 +897,7 @@
       renderMyBets();
       fetchLiveOdds();
 
-      // Poll ESPN & DraftKings every 30 seconds for live score changes
+      // Poll every 30 seconds for live score updates
       setInterval(() => {
         fetchLiveOdds(false);
       }, 30000);
