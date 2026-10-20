@@ -1,62 +1,17 @@
-Ran command: Checking DraftKings API (`powershell -Command "
-try {
-  $r = Invoke-RestMethod 'https://sportsbook.draftkings.com/api/sportscontent/navigation/v1/sports' -Headers @{'User-Agent'='Mozilla/5.0'}
-  $r | ConvertTo-Json -Depth 2 | Select-Object -First 20
-} catch {
-  $_.Exception.Message
-}
-"`)
-Ran command: DraftKings API sports list (`$headers = @{'User-Agent'='Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-try {
-  $r = Invoke-RestMethod 'https://sportsbook.draftkings.com/api/sportscontent/navigation/v1/sports' -Headers $headers
-  $r.sports | Select-Object name, sportId | Select-Object -First 10
-} catch {
-  $_.Exception.Message
-}`)
-Ran command: DraftKings HTTP response (`curl.exe -s -i "https://sportsbook.draftkings.com/api/sportscontent/navigation/v1/sports" -H "User-Agent: Mozilla/5.0" | Select-Object -First 10`)
-Ran command: ESPN summary endpoint properties (`$r = Invoke-RestMethod 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909090'; $r | Get-Member -MemberType NoteProperty | Select-Object Name`)
-Ran command: Checking pickcenter details (`$r = Invoke-RestMethod 'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/summary?event=401909090'; $r.pickcenter | ConvertTo-Json -Depth 3 | Select-Object -First 30`)
-Ran command: DraftKings event API check (`curl.exe -s -i "https://sportsbook.draftkings.com//sites/US-SB/api/v5/event/34510039" -H "User-Agent: Mozilla/5.0" | Select-Object -First 10`)
+Looking at your screenshot, that text is sitting on **line 1 inside your `index.html` file on GitHub**. 
 
-### Why that text appeared at the top of your website:
-
-When you copied the code previously, some of the chat text (like `Ran command: Checking node...`) got accidentally highlighted and pasted into GitHub along with the code.
-
-To avoid this, **use the "Copy" button in the top-right corner of the black code box below** instead of manually highlighting with your mouse. That way, only pure HTML is copied.
+When pasting, that text was left at the very top before `<!DOCTYPE html>`.
 
 ---
 
-### What has been updated:
+### How to fix it in 30 seconds:
 
-1. **Clean Code with No Extraneous Text**: The file starts strictly with `<!DOCTYPE html>`.
-2. **DraftKings-Style Player Props by Category (3–4 Main Markets)**:
-   - **🏀 NBA**: 
-     - *Points* (O/U)
-     - *Rebounds* (O/U)
-     - *Assists* (O/U)
-     - *3-Pointers Made* (O/U)
-   - **🏈 NFL**: 
-     - *Passing Yards* (O/U)
-     - *Rushing Yards* (O/U)
-     - *Receiving Yards* (O/U)
-     - *Anytime Touchdown Scorer* (Yes)
-   - **⚽ EPL**: 
-     - *Anytime Goalscorer* (Yes)
-     - *Shots on Target* (O/U)
-     - *Player Assists* (O/U)
-3. **Category Tabs**: You can filter between the 3–4 prop categories inside any matchup.
-4. **DraftKings Odds & Vig**: Realistic DraftKings lines and odds with multi-prop parlay support.
-
----
-
-### Step-by-Step GitHub Update:
-
-1. Open your repository on [GitHub.com](https://github.com).
-2. Click on **`index.html`**.
-3. Click the **pencil icon** (✏️) in the top-right corner to edit.
-4. Select all the current text (`Ctrl + A` on Windows or `Cmd + A` on Mac) and hit **Delete** / **Backspace** so the file is completely blank.
-5. Click the **"Copy" button** in the top-right corner of the code block below.
-6. Paste into GitHub.
+1. Open your repository on [GitHub.com](https://github.com) and click **`index.html`**.
+2. Click the **pencil icon** (✏️) in the top right to edit.
+3. Look at the very top of the editor — you will see that exact text sitting on line 1.
+4. Press **`Ctrl` + `A`** (or **`Cmd` + `A`** on Mac) to select everything, and press **Backspace** or **Delete**. **Make sure the editor is 100% empty.**
+5. Click the **Copy button** in the top-right corner of the code block below.
+6. Paste it into the empty GitHub editor (line 1 must start with `<!DOCTYPE html>`).
 7. Click **Commit changes...** ➔ **Commit changes**.
 
 ---
@@ -491,7 +446,7 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
     // STATE MANAGEMENT
     let liveGames = [];
     let expandedProps = new Set();
-    let propCategoryFilters = {}; // Maps gameId -> selectedCategory
+    let propCategoryFilters = {};
     let currentFilter = "ALL";
     let searchQuery = "";
     let userBalance = parseFloat(localStorage.getItem("apex_balance") || "2500.00");
@@ -556,7 +511,7 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
             const isCompleted = event.status?.type?.completed === true || 
                                 event.status?.type?.state === 'post' || 
                                 event.status?.type?.name === 'STATUS_FINAL';
-            if (isCompleted) return; // Strictly skip finished games
+            if (isCompleted) return;
 
             const comp = event.competitions && event.competitions[0];
             if (!comp) return;
@@ -668,7 +623,6 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
       renderGames();
     }
 
-    // CHANGE PROP CATEGORY TAB
     function setPropCategory(gameId, cat) {
       propCategoryFilters[gameId] = cat;
       renderGames();
@@ -709,11 +663,8 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
         const isExpanded = expandedProps.has(game.id) || searchQuery.length > 0;
         const availableCats = DK_PROP_CATEGORIES[game.sport] || ["All Props"];
         const selectedCat = propCategoryFilters[game.id] || "ALL";
-
-        // Filter props by category if selected
         const visibleProps = selectedCat === "ALL" ? allProps : allProps.filter(p => p.cat === selectedCat);
 
-        // PLAYER PROPS GRID HTML
         let propsHtml = "";
         if (isExpanded) {
           const categoryTabs = `
@@ -733,7 +684,6 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
 
           const propsCards = visibleProps.map(prop => {
             if (prop.isSingle) {
-              // Single Choice (e.g. Anytime TD / Goalscorer)
               return `
                 <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-sm">
                   <div class="min-w-0">
@@ -748,7 +698,6 @@ To avoid this, **use the "Copy" button in the top-right corner of the black code
                 </div>
               `;
             } else {
-              // Over / Under Prop
               return `
                 <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-2.5 flex flex-col justify-between gap-2 shadow-sm">
                   <div class="flex items-center justify-between">
