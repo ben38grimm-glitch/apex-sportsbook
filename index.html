@@ -70,7 +70,7 @@
         </div>
         <div>
           <span class="text-xl font-black tracking-tight text-white">APEX<span class="text-brand-green">BET</span></span>
-          <span class="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold text-slate-400 bg-brand-card px-2 py-0.5 rounded border border-brand-border">Sports & Casino</span>
+          <span class="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold text-slate-400 bg-brand-card px-2 py-0.5 rounded border border-brand-border">DraftKings Odds</span>
         </div>
       </div>
 
@@ -104,17 +104,17 @@
       <!-- DUAL STATS PILLS: SPORTSBOOK & CASINO -->
       <div class="hidden md:flex items-center gap-2">
         <!-- Sports Stats -->
-        <div id="headerSportsStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs font-bold transition">
-          <span class="text-slate-400 text-[10px] uppercase">🏈 Sports:</span>
+        <div id="headerSportsStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-green/40 px-3 py-1.5 rounded-xl text-xs font-bold transition">
+          <span class="text-slate-400 text-[10px] uppercase font-bold">🏈 Sports:</span>
           <span id="sportsStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
-          <span id="sportsStatsHitRate" class="text-brand-green font-mono font-black">0.0%</span>
+          <span id="sportsStatsHitRate" class="text-brand-green font-mono font-black">0.0% Win</span>
         </div>
 
         <!-- Casino Stats -->
         <div id="headerCasinoStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs font-bold transition">
-          <span class="text-slate-400 text-[10px] uppercase">🎰 Casino:</span>
+          <span class="text-slate-400 text-[10px] uppercase font-bold">🎰 Casino:</span>
           <span id="casinoStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
-          <span id="casinoStatsHitRate" class="text-amber-400 font-mono font-black">0.0%</span>
+          <span id="casinoStatsHitRate" class="text-amber-400 font-mono font-black">0.0% Win</span>
         </div>
       </div>
 
@@ -146,15 +146,15 @@
       
       <!-- MOBILE STATS BANNER -->
       <div class="md:hidden mb-4 grid grid-cols-2 gap-2 text-xs font-bold">
-        <div class="bg-brand-card border border-brand-border rounded-xl p-2.5">
-          <div class="text-[10px] text-slate-400 uppercase">🏈 Sportsbook Record</div>
+        <div class="bg-brand-card border border-brand-green/40 rounded-xl p-2.5">
+          <div class="text-[10px] text-slate-400 uppercase">🏈 Sportsbook Win Rate</div>
           <div class="flex items-center justify-between mt-1">
             <span id="sportsRecordMobile" class="text-white font-mono font-black">0W - 0L</span>
             <span id="sportsHitRateMobile" class="text-brand-green font-mono font-black">0.0%</span>
           </div>
         </div>
-        <div class="bg-brand-card border border-brand-border rounded-xl p-2.5">
-          <div class="text-[10px] text-slate-400 uppercase">🎰 Casino Record</div>
+        <div class="bg-brand-card border border-amber-500/40 rounded-xl p-2.5">
+          <div class="text-[10px] text-slate-400 uppercase">🎰 Casino Win Rate</div>
           <div class="flex items-center justify-between mt-1">
             <span id="casinoRecordMobile" class="text-white font-mono font-black">0W - 0L</span>
             <span id="casinoHitRateMobile" class="text-amber-400 font-mono font-black">0.0%</span>
@@ -166,11 +166,11 @@
       <div class="mb-6 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-brand-card to-slate-900 p-5 border border-brand-green/30 relative overflow-hidden shadow-2xl">
         <div class="relative z-10 max-w-xl">
           <div class="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/30 text-brand-green text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-            <span>Live ESPN & DraftKings Feed Active</span>
+            <i data-lucide="target" class="w-3.5 h-3.5"></i>
+            <span>DraftKings Player Props Active</span>
           </div>
           <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">NFL, NBA & Premier League Board</h2>
-          <p class="text-xs text-slate-300 mt-1">Spreads, Moneylines, Totals, and official DraftKings star player prop markets.</p>
+          <p class="text-xs text-slate-300 mt-1">Every match features 3–4 official DraftKings prop categories with star player lines.</p>
         </div>
       </div>
 
@@ -179,7 +179,7 @@
         <!-- Search -->
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams or players (Chiefs, Tatum, Haaland, Mahomes, Curry)..."
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams or players (Mahomes, Allen, Henry, Tatum, Haaland)..."
             class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-green transition" />
         </div>
 
@@ -433,205 +433,171 @@
 
   <!-- CORE LOGIC JAVASCRIPT -->
   <script>
-    // DRAFTKINGS-STYLE 3-4 KEY PROP CATEGORIES PER SPORT
+    // 3-4 KEY PROP CATEGORIES PER SPORT
     const DK_PROP_CATEGORIES = {
       NBA: ["Points", "Rebounds", "Assists", "3-Pointers Made"],
       NFL: ["Passing Yards", "Rushing Yards", "Receiving Yards", "Anytime Touchdown"],
       EPL: ["Anytime Goalscorer", "Shots on Target", "Assists"]
     };
 
-    // EXPANDED STAR PLAYER PROPS DATABASE
-    const DK_PLAYER_DATABASE = {
-      // NBA TEAMS
-      "Celtics": [
-        { player: "Jayson Tatum", cat: "Points", line: 27.5, over: -115, under: -115 },
-        { player: "Jayson Tatum", cat: "Rebounds", line: 8.5, over: -110, under: -120 },
-        { player: "Jayson Tatum", cat: "3-Pointers Made", line: 3.5, over: +110, under: -140 },
-        { player: "Jaylen Brown", cat: "Points", line: 23.5, over: -115, under: -115 },
-        { player: "Jaylen Brown", cat: "Rebounds", line: 5.5, over: -110, under: -120 },
-        { player: "Jrue Holiday", cat: "Assists", line: 5.5, over: -120, under: -110 },
-        { player: "Derrick White", cat: "3-Pointers Made", line: 2.5, over: -125, under: -105 }
-      ],
-      "Pistons": [
-        { player: "Cade Cunningham", cat: "Points", line: 22.5, over: -115, under: -115 },
-        { player: "Cade Cunningham", cat: "Assists", line: 7.5, over: -110, under: -120 },
-        { player: "Jalen Duren", cat: "Rebounds", line: 11.5, over: -115, under: -115 },
-        { player: "Jaden Ivey", cat: "Points", line: 16.5, over: -115, under: -115 }
-      ],
-      "76ers": [
-        { player: "Joel Embiid", cat: "Points", line: 30.5, over: -115, under: -115 },
-        { player: "Joel Embiid", cat: "Rebounds", line: 11.0, over: -115, under: -115 },
-        { player: "Tyrese Maxey", cat: "Points", line: 25.5, over: -110, under: -120 },
-        { player: "Tyrese Maxey", cat: "3-Pointers Made", line: 3.5, over: +115, under: -145 },
-        { player: "Paul George", cat: "Points", line: 21.5, over: -115, under: -115 }
-      ],
-      "Knicks": [
-        { player: "Jalen Brunson", cat: "Points", line: 28.5, over: -115, under: -115 },
-        { player: "Jalen Brunson", cat: "Assists", line: 6.5, over: -110, under: -120 },
-        { player: "Karl-Anthony Towns", cat: "Points", line: 21.5, over: -115, under: -115 },
-        { player: "Karl-Anthony Towns", cat: "Rebounds", line: 10.5, over: -115, under: -115 },
-        { player: "Mikal Bridges", cat: "3-Pointers Made", line: 2.5, over: -125, under: -105 },
-        { player: "OG Anunoby", cat: "Points", line: 15.5, over: -115, under: -115 }
-      ],
-      "Thunder": [
-        { player: "Shai Gilgeous-Alexander", cat: "Points", line: 30.5, over: -115, under: -115 },
-        { player: "Shai Gilgeous-Alexander", cat: "Assists", line: 6.5, over: -110, under: -120 },
-        { player: "Chet Holmgren", cat: "Rebounds", line: 8.5, over: -115, under: -115 },
-        { player: "Jalen Williams", cat: "Points", line: 19.5, over: -115, under: -115 }
-      ],
-      "Spurs": [
-        { player: "Victor Wembanyama", cat: "Points", line: 23.5, over: -115, under: -115 },
-        { player: "Victor Wembanyama", cat: "Rebounds", line: 10.5, over: -115, under: -115 },
-        { player: "Chris Paul", cat: "Assists", line: 7.5, over: -120, under: -110 },
-        { player: "Devin Vassell", cat: "3-Pointers Made", line: 2.5, over: -115, under: -115 }
-      ],
-      "Lakers": [
-        { player: "LeBron James", cat: "Points", line: 24.5, over: -115, under: -115 },
-        { player: "LeBron James", cat: "Assists", line: 7.5, over: -115, under: -115 },
-        { player: "LeBron James", cat: "Rebounds", line: 7.5, over: -110, under: -120 },
-        { player: "Anthony Davis", cat: "Points", line: 25.5, over: -115, under: -115 },
-        { player: "Anthony Davis", cat: "Rebounds", line: 12.5, over: -120, under: -110 },
-        { player: "Austin Reaves", cat: "Points", line: 16.5, over: -115, under: -115 }
-      ],
-      "Warriors": [
-        { player: "Stephen Curry", cat: "Points", line: 26.5, over: -115, under: -115 },
-        { player: "Stephen Curry", cat: "3-Pointers Made", line: 4.5, over: -120, under: -110 },
-        { player: "Draymond Green", cat: "Assists", line: 6.5, over: -115, under: -115 },
-        { player: "Jonathan Kuminga", cat: "Points", line: 17.5, over: -115, under: -115 }
-      ],
-      "Nuggets": [
-        { player: "Nikola Jokić", cat: "Points", line: 26.5, over: -110, under: -120 },
-        { player: "Nikola Jokić", cat: "Rebounds", line: 12.5, over: -115, under: -115 },
-        { player: "Nikola Jokić", cat: "Assists", line: 9.5, over: -115, under: -115 },
-        { player: "Jamal Murray", cat: "Points", line: 21.5, over: -115, under: -115 }
-      ],
-      "Bucks": [
-        { player: "Giannis Antetokounmpo", cat: "Points", line: 30.5, over: -115, under: -115 },
-        { player: "Giannis Antetokounmpo", cat: "Rebounds", line: 11.5, over: -120, under: -110 },
-        { player: "Damian Lillard", cat: "Points", line: 24.5, over: -110, under: -120 },
-        { player: "Damian Lillard", cat: "3-Pointers Made", line: 3.5, over: +105, under: -135 }
-      ],
-      "Mavericks": [
-        { player: "Luka Dončić", cat: "Points", line: 31.5, over: -115, under: -115 },
-        { player: "Luka Dončić", cat: "Assists", line: 8.5, over: -115, under: -115 },
-        { player: "Kyrie Irving", cat: "Points", line: 24.5, over: -115, under: -115 }
-      ],
-
+    // COMPREHENSIVE TEAM STAR ROSTERS (NFL, NBA, EPL)
+    const ROSTER_STARS = {
       // NFL TEAMS
-      "Chiefs": [
-        { player: "Patrick Mahomes", cat: "Passing Yards", line: 262.5, over: -115, under: -115 },
-        { player: "Travis Kelce", cat: "Receiving Yards", line: 62.5, over: -115, under: -115 },
-        { player: "Travis Kelce", cat: "Anytime Touchdown", line: "Yes", over: +115, isSingle: true },
-        { player: "Isiah Pacheco", cat: "Rushing Yards", line: 66.5, over: -115, under: -115 }
-      ],
-      "49ers": [
-        { player: "Brock Purdy", cat: "Passing Yards", line: 254.5, over: -115, under: -115 },
-        { player: "Christian McCaffrey", cat: "Rushing Yards", line: 74.5, over: -115, under: -115 },
-        { player: "Christian McCaffrey", cat: "Anytime Touchdown", line: "Yes", over: -150, isSingle: true },
-        { player: "George Kittle", cat: "Receiving Yards", line: 55.5, over: -115, under: -115 }
-      ],
-      "Ravens": [
-        { player: "Lamar Jackson", cat: "Passing Yards", line: 224.5, over: -115, under: -115 },
-        { player: "Derrick Henry", cat: "Rushing Yards", line: 82.5, over: -115, under: -115 },
-        { player: "Derrick Henry", cat: "Anytime Touchdown", line: "Yes", over: -140, isSingle: true },
-        { player: "Zay Flowers", cat: "Receiving Yards", line: 58.5, over: -115, under: -115 }
-      ],
-      "Bills": [
-        { player: "Josh Allen", cat: "Passing Yards", line: 248.5, over: -115, under: -115 },
-        { player: "Josh Allen", cat: "Anytime Touchdown", line: "Yes", over: -110, isSingle: true },
-        { player: "James Cook", cat: "Rushing Yards", line: 64.5, over: -115, under: -115 }
-      ],
-      "Eagles": [
-        { player: "Jalen Hurts", cat: "Passing Yards", line: 232.5, over: -115, under: -115 },
-        { player: "Saquon Barkley", cat: "Rushing Yards", line: 78.5, over: -115, under: -115 },
-        { player: "Saquon Barkley", cat: "Anytime Touchdown", line: "Yes", over: -125, isSingle: true },
-        { player: "A.J. Brown", cat: "Receiving Yards", line: 76.5, over: -115, under: -115 }
-      ],
-      "Packers": [
-        { player: "Jordan Love", cat: "Passing Yards", line: 252.5, over: -115, under: -115 },
-        { player: "Josh Jacobs", cat: "Rushing Yards", line: 68.5, over: -115, under: -115 },
-        { player: "Josh Jacobs", cat: "Anytime Touchdown", line: "Yes", over: -110, isSingle: true },
-        { player: "Jayden Reed", cat: "Receiving Yards", line: 54.5, over: -115, under: -115 }
-      ],
-      "Panthers": [
-        { player: "Bryce Young", cat: "Passing Yards", line: 198.5, over: -115, under: -115 },
-        { player: "Chuba Hubbard", cat: "Rushing Yards", line: 64.5, over: -115, under: -115 },
-        { player: "Chuba Hubbard", cat: "Anytime Touchdown", line: "Yes", over: +135, isSingle: true },
-        { player: "Diontae Johnson", cat: "Receiving Yards", line: 52.5, over: -115, under: -115 }
-      ],
+      "Ravens": { qb: "Lamar Jackson", rb: "Derrick Henry", wr1: "Zay Flowers", te: "Mark Andrews" },
+      "Bills": { qb: "Josh Allen", rb: "James Cook", wr1: "Keon Coleman", te: "Dawson Knox" },
+      "Cardinals": { qb: "Kyler Murray", rb: "James Conner", wr1: "Marvin Harrison Jr.", te: "Trey McBride" },
+      "Cowboys": { qb: "Dak Prescott", rb: "Rico Dowdle", wr1: "CeeDee Lamb", te: "Jake Ferguson" },
+      "Vikings": { qb: "Sam Darnold", rb: "Aaron Jones", wr1: "Justin Jefferson", te: "Jordan Addison" },
+      "Lions": { qb: "Jared Goff", rb: "Jahmyr Gibbs", wr1: "Amon-Ra St. Brown", te: "David Montgomery" },
+      "Falcons": { qb: "Kirk Cousins", rb: "Bijan Robinson", wr1: "Drake London", te: "Kyle Pitts" },
+      "Buccaneers": { qb: "Baker Mayfield", rb: "Bucky Irving", wr1: "Mike Evans", te: "Chris Godwin" },
+      "Bengals": { qb: "Joe Burrow", rb: "Chase Brown", wr1: "Ja'Marr Chase", te: "Tee Higgins" },
+      "Titans": { qb: "Will Levis", rb: "Tony Pollard", wr1: "Calvin Ridley", te: "DeAndre Hopkins" },
+      "Chiefs": { qb: "Patrick Mahomes", rb: "Isiah Pacheco", wr1: "Xavier Worthy", te: "Travis Kelce" },
+      "Broncos": { qb: "Bo Nix", rb: "Javonte Williams", wr1: "Courtland Sutton", te: "Lil'Jordan Humphrey" },
+      "Eagles": { qb: "Jalen Hurts", rb: "Saquon Barkley", wr1: "A.J. Brown", te: "DeVonta Smith" },
+      "Commanders": { qb: "Jayden Daniels", rb: "Brian Robinson Jr.", wr1: "Terry McLaurin", te: "Zach Ertz" },
+      "Bears": { qb: "Caleb Williams", rb: "D'Andre Swift", wr1: "DJ Moore", te: "Rome Odunze" },
+      "Seahawks": { qb: "Geno Smith", rb: "Kenneth Walker III", wr1: "DK Metcalf", te: "Jaxon Smith-Njigba" },
+      "Chargers": { qb: "Justin Herbert", rb: "J.K. Dobbins", wr1: "Ladd McConkey", te: "Quentin Johnston" },
+      "Rams": { qb: "Matthew Stafford", rb: "Kyren Williams", wr1: "Cooper Kupp", te: "Puka Nacua" },
+      "Browns": { qb: "Jameis Winston", rb: "Nick Chubb", wr1: "Jerry Jeudy", te: "David Njoku" },
+      "Steelers": { qb: "Russell Wilson", rb: "Najee Harris", wr1: "George Pickens", te: "Pat Freiermuth" },
+      "Colts": { qb: "Anthony Richardson", rb: "Jonathan Taylor", wr1: "Michael Pittman Jr.", te: "Josh Downs" },
+      "Jaguars": { qb: "Trevor Lawrence", rb: "Travis Etienne Jr.", wr1: "Brian Thomas Jr.", te: "Christian Kirk" },
+      "Patriots": { qb: "Drake Maye", rb: "Rhamondre Stevenson", wr1: "Demario Douglas", te: "Hunter Henry" },
+      "Dolphins": { qb: "Tua Tagovailoa", rb: "De'Von Achane", wr1: "Tyreek Hill", te: "Jaylen Waddle" },
+      "Raiders": { qb: "Gardner Minshew", rb: "Alexander Mattison", wr1: "Jakobi Meyers", te: "Brock Bowers" },
+      "Jets": { qb: "Aaron Rodgers", rb: "Breece Hall", wr1: "Davante Adams", te: "Garrett Wilson" },
+      "Panthers": { qb: "Bryce Young", rb: "Chuba Hubbard", wr1: "Diontae Johnson", te: "Xavier Legette" },
+      "Packers": { qb: "Jordan Love", rb: "Josh Jacobs", wr1: "Jayden Reed", te: "Romeo Doubs" },
+      "49ers": { qb: "Brock Purdy", rb: "Christian McCaffrey", wr1: "Deebo Samuel", te: "George Kittle" },
+      "Texans": { qb: "C.J. Stroud", rb: "Joe Mixon", wr1: "Nico Collins", te: "Stefon Diggs" },
 
-      // EPL SOCCER
-      "Man City": [
-        { player: "Erling Haaland", cat: "Anytime Goalscorer", line: "Yes", over: -145, isSingle: true },
-        { player: "Erling Haaland", cat: "Shots on Target", line: 1.5, over: -120, under: -110 },
-        { player: "Kevin De Bruyne", cat: "Assists", line: 0.5, over: +160, under: -220 },
-        { player: "Phil Foden", cat: "Shots on Target", line: 0.5, over: -150, under: +115 }
-      ],
-      "Arsenal": [
-        { player: "Bukayo Saka", cat: "Anytime Goalscorer", line: "Yes", over: +185, isSingle: true },
-        { player: "Bukayo Saka", cat: "Shots on Target", line: 0.5, over: -150, under: +115 },
-        { player: "Kai Havertz", cat: "Anytime Goalscorer", line: "Yes", over: +190, isSingle: true },
-        { player: "Declan Rice", cat: "Assists", line: 0.5, over: +260, under: -360 }
-      ],
-      "Liverpool": [
-        { player: "Mohamed Salah", cat: "Anytime Goalscorer", line: "Yes", over: +120, isSingle: true },
-        { player: "Mohamed Salah", cat: "Shots on Target", line: 1.5, over: -110, under: -120 },
-        { player: "Trent Alexander-Arnold", cat: "Assists", line: 0.5, over: +185, under: -250 }
-      ],
-      "Chelsea": [
-        { player: "Cole Palmer", cat: "Anytime Goalscorer", line: "Yes", over: +160, isSingle: true },
-        { player: "Cole Palmer", cat: "Shots on Target", line: 1.5, over: +105, under: -135 },
-        { player: "Nicolas Jackson", cat: "Anytime Goalscorer", line: "Yes", over: +195, isSingle: true }
-      ],
-      "Aston Villa": [
-        { player: "Ollie Watkins", cat: "Anytime Goalscorer", line: "Yes", over: +165, isSingle: true },
-        { player: "Ollie Watkins", cat: "Shots on Target", line: 1.5, over: +110, under: -140 }
-      ],
-      "Tottenham": [
-        { player: "Son Heung-min", cat: "Anytime Goalscorer", line: "Yes", over: +175, isSingle: true },
-        { player: "James Maddison", cat: "Assists", line: 0.5, over: +195, under: -260 }
-      ]
+      // NBA TEAMS
+      "Celtics": { g1: "Jayson Tatum", g2: "Jaylen Brown", f: "Derrick White", c: "Jrue Holiday" },
+      "Pistons": { g1: "Cade Cunningham", g2: "Jaden Ivey", f: "Tobias Harris", c: "Jalen Duren" },
+      "76ers": { g1: "Tyrese Maxey", g2: "Paul George", f: "Kelly Oubre Jr.", c: "Joel Embiid" },
+      "Knicks": { g1: "Jalen Brunson", g2: "Mikal Bridges", f: "OG Anunoby", c: "Karl-Anthony Towns" },
+      "Thunder": { g1: "Shai Gilgeous-Alexander", g2: "Jalen Williams", f: "Lu Dort", c: "Chet Holmgren" },
+      "Spurs": { g1: "Chris Paul", g2: "Devin Vassell", f: "Jeremy Sochan", c: "Victor Wembanyama" },
+      "Lakers": { g1: "D'Angelo Russell", g2: "Austin Reaves", f: "LeBron James", c: "Anthony Davis" },
+      "Warriors": { g1: "Stephen Curry", g2: "Buddy Hield", f: "Jonathan Kuminga", c: "Draymond Green" },
+      "Nuggets": { g1: "Jamal Murray", g2: "Christian Braun", f: "Michael Porter Jr.", c: "Nikola Jokić" },
+      "Bucks": { g1: "Damian Lillard", g2: "Gary Trent Jr.", f: "Giannis Antetokounmpo", c: "Brook Lopez" },
+      "Mavericks": { g1: "Luka Dončić", g2: "Kyrie Irving", f: "Klay Thompson", c: "Dereck Lively II" },
+      "Suns": { g1: "Devin Booker", g2: "Bradley Beal", f: "Kevin Durant", c: "Jusuf Nurkić" },
+      "Heat": { g1: "Tyler Herro", g2: "Terry Rozier", f: "Jimmy Butler", c: "Bam Adebayo" },
+      "Timberwolves": { g1: "Anthony Edwards", g2: "Mike Conley", f: "Julius Randle", c: "Rudy Gobert" },
+      "Pacers": { g1: "Tyrese Haliburton", g2: "Andrew Nembhard", f: "Pascal Siakam", c: "Myles Turner" },
+      "Cavaliers": { g1: "Donovan Mitchell", g2: "Darius Garland", f: "Evan Mobley", c: "Jarrett Allen" },
+
+      // EPL SOCCER CLUBS
+      "Man City": { f1: "Erling Haaland", f2: "Phil Foden", m: "Kevin De Bruyne" },
+      "Arsenal": { f1: "Bukayo Saka", f2: "Kai Havertz", m: "Martin Ødegaard" },
+      "Liverpool": { f1: "Mohamed Salah", f2: "Luis Díaz", m: "Trent Alexander-Arnold" },
+      "Chelsea": { f1: "Cole Palmer", f2: "Nicolas Jackson", m: "Enzo Fernández" },
+      "Aston Villa": { f1: "Ollie Watkins", f2: "Leon Bailey", m: "Morgan Rogers" },
+      "Tottenham": { f1: "Son Heung-min", f2: "Dominic Solanke", m: "James Maddison" },
+      "Newcastle": { f1: "Alexander Isak", f2: "Anthony Gordon", m: "Bruno Guimarães" },
+      "Nottingham": { f1: "Chris Wood", f2: "Callum Hudson-Odoi", m: "Morgan Gibbs-White" },
+      "Ipswich": { f1: "Liam Delap", f2: "Sammie Szmodics", m: "Leif Davis" }
     };
 
+    // GENERATE 3-4 PROPS PER CATEGORY FOR EVERY GAME
     function getPropsForGame(game) {
-      let list = [];
-      const findProps = (teamName, shortName) => {
-        for (const [key, props] of Object.entries(DK_PLAYER_DATABASE)) {
-          if (teamName.includes(key) || shortName.includes(key)) {
-            return props.map(p => ({ ...p, team: shortName }));
-          }
+      let props = [];
+
+      const findTeamRoster = (name) => {
+        for (const [key, roster] of Object.entries(ROSTER_STARS)) {
+          if (name.includes(key)) return { key, ...roster };
         }
         return null;
       };
 
-      const awayList = findProps(game.awayTeam.name, game.awayTeam.shortName);
-      const homeList = findProps(game.homeTeam.name, game.homeTeam.shortName);
-      if (awayList) list.push(...awayList);
-      if (homeList) list.push(...homeList);
+      const awayRoster = findTeamRoster(game.awayTeam.name) || { key: game.awayTeam.shortName, qb: `${game.awayTeam.shortName} QB`, rb: `${game.awayTeam.shortName} RB`, wr1: `${game.awayTeam.shortName} WR`, te: `${game.awayTeam.shortName} TE`, g1: `${game.awayTeam.shortName} Star`, g2: `${game.awayTeam.shortName} Guard`, f: `${game.awayTeam.shortName} Forward`, c: `${game.awayTeam.shortName} Center`, f1: `${game.awayTeam.shortName} Striker`, f2: `${game.awayTeam.shortName} Winger`, m: `${game.awayTeam.shortName} Mid` };
+      const homeRoster = findTeamRoster(game.homeTeam.name) || { key: game.homeTeam.shortName, qb: `${game.homeTeam.shortName} QB`, rb: `${game.homeTeam.shortName} RB`, wr1: `${game.homeTeam.shortName} WR`, te: `${game.homeTeam.shortName} TE`, g1: `${game.homeTeam.shortName} Star`, g2: `${game.homeTeam.shortName} Guard`, f: `${game.homeTeam.shortName} Forward`, c: `${game.homeTeam.shortName} Center`, f1: `${game.homeTeam.shortName} Striker`, f2: `${game.homeTeam.shortName} Winger`, m: `${game.homeTeam.shortName} Mid` };
 
-      if (list.length === 0) {
-        if (game.sport === 'NBA') {
-          list.push(
-            { player: `${game.awayTeam.shortName} Guard`, team: game.awayTeam.shortName, cat: "Points", line: 22.5, over: -115, under: -115 },
-            { player: `${game.awayTeam.shortName} Center`, team: game.awayTeam.shortName, cat: "Rebounds", line: 9.5, over: -110, under: -120 },
-            { player: `${game.homeTeam.shortName} Guard`, team: game.homeTeam.shortName, cat: "Points", line: 24.5, over: -115, under: -115 },
-            { player: `${game.homeTeam.shortName} Forward`, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: +105, under: -135 }
-          );
-        } else if (game.sport === 'NFL') {
-          list.push(
-            { player: `${game.awayTeam.shortName} Starting QB`, team: game.awayTeam.shortName, cat: "Passing Yards", line: 238.5, over: -115, under: -115 },
-            { player: `${game.awayTeam.shortName} Lead RB`, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +125, isSingle: true },
-            { player: `${game.homeTeam.shortName} Starting QB`, team: game.homeTeam.shortName, cat: "Passing Yards", line: 245.5, over: -115, under: -115 },
-            { player: `${game.homeTeam.shortName} Lead RB`, team: game.homeTeam.shortName, cat: "Rushing Yards", line: 68.5, over: -115, under: -115 }
-          );
-        } else {
-          list.push(
-            { player: `${game.awayTeam.shortName} Top Striker`, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +175, isSingle: true },
-            { player: `${game.homeTeam.shortName} Top Striker`, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +165, isSingle: true }
-          );
-        }
+      if (game.sport === 'NFL') {
+        // 1. Passing Yards (3-4 QBs)
+        props.push(
+          { player: awayRoster.qb, team: game.awayTeam.shortName, cat: "Passing Yards", line: 242.5, over: -115, under: -115 },
+          { player: homeRoster.qb, team: game.homeTeam.shortName, cat: "Passing Yards", line: 248.5, over: -115, under: -115 }
+        );
+        // 2. Rushing Yards (3-4 RBs)
+        props.push(
+          { player: awayRoster.rb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 68.5, over: -115, under: -115 },
+          { player: homeRoster.rb, team: game.homeTeam.shortName, cat: "Rushing Yards", line: 72.5, over: -115, under: -115 },
+          { player: awayRoster.qb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 26.5, over: -110, under: -120 }
+        );
+        // 3. Receiving Yards (3-4 WRs / TEs)
+        props.push(
+          { player: awayRoster.wr1, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 68.5, over: -115, under: -115 },
+          { player: homeRoster.wr1, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 74.5, over: -115, under: -115 },
+          { player: awayRoster.te, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 48.5, over: -110, under: -120 },
+          { player: homeRoster.te, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 52.5, over: -115, under: -115 }
+        );
+        // 4. Anytime Touchdown (3-4 Scorers)
+        props.push(
+          { player: awayRoster.rb, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -110, isSingle: true },
+          { player: homeRoster.rb, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -125, isSingle: true },
+          { player: awayRoster.wr1, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +125, isSingle: true },
+          { player: homeRoster.wr1, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +115, isSingle: true }
+        );
+      } else if (game.sport === 'NBA') {
+        // 1. Points (3-4 Players)
+        props.push(
+          { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Points", line: 26.5, over: -115, under: -115 },
+          { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "Points", line: 27.5, over: -115, under: -115 },
+          { player: awayRoster.g2, team: game.awayTeam.shortName, cat: "Points", line: 21.5, over: -110, under: -120 },
+          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Points", line: 22.5, over: -115, under: -115 }
+        );
+        // 2. Rebounds (3-4 Players)
+        props.push(
+          { player: awayRoster.c, team: game.awayTeam.shortName, cat: "Rebounds", line: 10.5, over: -115, under: -115 },
+          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Rebounds", line: 11.5, over: -120, under: -110 },
+          { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Rebounds", line: 7.5, over: -110, under: -120 },
+          { player: homeRoster.f, team: game.homeTeam.shortName, cat: "Rebounds", line: 6.5, over: -115, under: -115 }
+        );
+        // 3. Assists (3-4 Players)
+        props.push(
+          { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Assists", line: 6.5, over: -115, under: -115 },
+          { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "Assists", line: 7.5, over: -110, under: -120 },
+          { player: awayRoster.f, team: game.awayTeam.shortName, cat: "Assists", line: 4.5, over: -125, under: -105 },
+          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Assists", line: 5.5, over: -115, under: -115 }
+        );
+        // 4. 3-Pointers Made (3-4 Players)
+        props.push(
+          { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 3.5, over: +110, under: -140 },
+          { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -125, under: -105 },
+          { player: awayRoster.g2, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -115, under: -115 },
+          { player: homeRoster.f, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 1.5, over: -145, under: +115 }
+        );
+      } else {
+        // EPL SOCCER
+        // 1. Anytime Goalscorer
+        props.push(
+          { player: awayRoster.f1, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +160, isSingle: true },
+          { player: homeRoster.f1, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +140, isSingle: true },
+          { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +220, isSingle: true },
+          { player: homeRoster.f2, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +190, isSingle: true }
+        );
+        // 2. Shots on Target
+        props.push(
+          { player: awayRoster.f1, team: game.awayTeam.shortName, cat: "Shots on Target", line: 1.5, over: -110, under: -120 },
+          { player: homeRoster.f1, team: game.homeTeam.shortName, cat: "Shots on Target", line: 1.5, over: -125, under: -105 },
+          { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Shots on Target", line: 0.5, over: -150, under: +115 },
+          { player: homeRoster.m, team: game.homeTeam.shortName, cat: "Shots on Target", line: 0.5, over: -140, under: +110 }
+        );
+        // 3. Assists
+        props.push(
+          { player: awayRoster.m, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +190, under: -260 },
+          { player: homeRoster.m, team: game.homeTeam.shortName, cat: "Assists", line: 0.5, over: +170, under: -230 },
+          { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +240, under: -320 }
+        );
       }
-      return list;
+
+      return props;
     }
 
     // APP GLOBAL STATE WITH SEPARATE STATS
@@ -681,7 +647,7 @@
       const sTotal = sportsStats.wins + sportsStats.losses;
       const sHitRate = sTotal > 0 ? ((sportsStats.wins / sTotal) * 100).toFixed(1) : "0.0";
       document.getElementById("sportsStatsRecord").textContent = `${sportsStats.wins}W - ${sportsStats.losses}L`;
-      document.getElementById("sportsStatsHitRate").textContent = `${sHitRate}%`;
+      document.getElementById("sportsStatsHitRate").textContent = `${sHitRate}% Win`;
 
       const mSRecord = document.getElementById("sportsRecordMobile");
       const mSHitRate = document.getElementById("sportsHitRateMobile");
@@ -692,7 +658,7 @@
       const cTotal = casinoStats.wins + casinoStats.losses;
       const cHitRate = cTotal > 0 ? ((casinoStats.wins / cTotal) * 100).toFixed(1) : "0.0";
       document.getElementById("casinoStatsRecord").textContent = `${casinoStats.wins}W - ${casinoStats.losses}L`;
-      document.getElementById("casinoStatsHitRate").textContent = `${cHitRate}%`;
+      document.getElementById("casinoStatsHitRate").textContent = `${cHitRate}% Win`;
 
       const mCRecord = document.getElementById("casinoRecordMobile");
       const mCHitRate = document.getElementById("casinoHitRateMobile");
@@ -719,16 +685,16 @@
         sportsSubNav.classList.remove("hidden");
         hubSportsBtn.className = "px-3.5 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-brand-card text-brand-green shadow-sm";
         hubCasinoBtn.className = "px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5";
-        sportsPill.classList.add("border-brand-green/60", "bg-brand-surface");
-        casinoPill.classList.remove("border-amber-400/60", "bg-brand-surface");
+        sportsPill.classList.add("border-brand-green/40");
+        casinoPill.classList.remove("border-amber-400/40");
       } else {
         sportsSection.classList.add("hidden");
         casinoSection.classList.remove("hidden");
         sportsSubNav.classList.add("hidden");
         hubCasinoBtn.className = "px-3.5 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-brand-card text-brand-green shadow-sm";
         hubSportsBtn.className = "px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5";
-        casinoPill.classList.add("border-amber-400/60", "bg-brand-surface");
-        sportsPill.classList.remove("border-brand-green/60", "bg-brand-surface");
+        casinoPill.classList.add("border-amber-400/40");
+        sportsPill.classList.remove("border-brand-green/40");
       }
     }
 
@@ -1201,17 +1167,13 @@
         const allProps = getPropsForGame(game);
         const isExpanded = expandedProps.has(game.id) || searchQuery.length > 0;
         const availableCats = DK_PROP_CATEGORIES[game.sport] || ["All Props"];
-        const selectedCat = propCategoryFilters[game.id] || "ALL";
-        const visibleProps = selectedCat === "ALL" ? allProps : allProps.filter(p => p.cat === selectedCat);
+        const selectedCat = propCategoryFilters[game.id] || availableCats[0];
+        const visibleProps = allProps.filter(p => p.cat === selectedCat);
 
         let propsHtml = "";
         if (isExpanded) {
           const categoryTabs = `
             <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-[11px] font-bold">
-              <button onclick="setPropCategory('${game.id}', 'ALL')" 
-                class="px-2.5 py-1 rounded-lg border transition ${selectedCat === 'ALL' ? 'bg-brand-green text-black border-brand-green' : 'bg-brand-dark text-slate-400 border-brand-border hover:text-white'}">
-                All Props
-              </button>
               ${availableCats.map(cat => `
                 <button onclick="setPropCategory('${game.id}', '${cat}')" 
                   class="px-2.5 py-1 rounded-lg border transition whitespace-nowrap ${selectedCat === cat ? 'bg-brand-green text-black border-brand-green' : 'bg-brand-dark text-slate-400 border-brand-border hover:text-white'}">
@@ -1266,9 +1228,9 @@
             <div class="mt-3.5 pt-3 border-t border-brand-border/70">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-[11px] font-black text-brand-green uppercase tracking-wider flex items-center gap-1.5">
-                  <i data-lucide="target" class="w-3.5 h-3.5"></i> DraftKings Props
+                  <i data-lucide="target" class="w-3.5 h-3.5"></i> DraftKings Props (${selectedCat})
                 </span>
-                <span class="text-[10px] text-slate-400">${visibleProps.length} Markets</span>
+                <span class="text-[10px] text-slate-400">${visibleProps.length} Markets Available</span>
               </div>
               ${categoryTabs}
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-2">
@@ -1364,7 +1326,7 @@
             <div class="mt-3 flex items-center justify-between border-t border-brand-border/40 pt-2.5">
               <button onclick="togglePropsDrawer('${game.id}')" class="flex items-center gap-1.5 text-xs font-extrabold ${isExpanded ? 'text-brand-green' : 'text-slate-400 hover:text-white'} transition">
                 <i data-lucide="target" class="w-3.5 h-3.5 text-brand-green"></i>
-                <span>Player Props & SGP (${allProps.length})</span>
+                <span>Player Props (${availableCats.length} Categories • ${allProps.length} Lines)</span>
                 <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-3.5 h-3.5"></i>
               </button>
               <span class="text-[10px] text-slate-500 font-semibold">DraftKings Props</span>
