@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Apex Sportsbook & Casino | NFL, NBA, EPL, Blackjack, Roulette & Slots</title>
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
@@ -29,198 +27,156 @@
     }
   </script>
   <style>
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #080c14; }
     ::-webkit-scrollbar-thumb { background: #23314d; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #00f076; }
-    .active-chip { background-color: #00f076 !important; color: #080c14 !important; font-weight: 800 !important; }
-    @keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-    .live-pulse { animation: pulse-live 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-    @keyframes reelSpin {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-50%); }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4f77; }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.15); }
+    }
+    .live-pulse { animation: pulseGlow 1.8s infinite ease-in-out; }
+    @keyframes spinWheel {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(1440deg); }
+    }
+    .spinning-wheel { animation: spinWheel 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    @keyframes slotBounce {
+      0% { transform: translateY(-10px); }
+      50% { transform: translateY(10px); }
       100% { transform: translateY(0); }
     }
-    .reel-spinning {
-      animation: reelSpin 0.35s linear infinite;
-    }
+    .slot-animate { animation: slotBounce 0.15s infinite; }
   </style>
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-green selection:text-black">
 
-  <!-- TOP LIVE TICKER -->
-  <header class="bg-brand-surface/90 backdrop-blur border-b border-brand-border sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-4 text-xs">
-      <div class="flex items-center gap-2 font-black tracking-wider text-brand-green uppercase shrink-0">
-        <span class="inline-block w-2 h-2 rounded-full bg-brand-green live-pulse"></span>
-        <span>Apex Live Scores</span>
+  <!-- TOP LIVE SCORES TICKER -->
+  <div class="bg-black/90 border-b border-brand-border/60 py-1.5 px-4 overflow-x-auto text-[11px] whitespace-nowrap scrollbar-none flex items-center gap-6" id="liveTickerBar">
+    <div class="flex items-center gap-1.5 text-brand-green font-bold shrink-0">
+      <span class="w-2 h-2 rounded-full bg-brand-green live-pulse"></span>
+      <span>LIVE TICKER</span>
+    </div>
+    <div id="tickerItems" class="flex items-center gap-6 text-slate-300 font-medium">
+      <span>Connecting to live ESPN & DraftKings feed...</span>
+    </div>
+  </div>
+
+  <!-- MAIN NAVIGATION -->
+  <header class="sticky top-0 z-40 bg-brand-surface/95 backdrop-blur-md border-b border-brand-border px-4 lg:px-8 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-4 lg:gap-6">
+      <!-- Logo -->
+      <div class="flex items-center gap-2 cursor-pointer group" onclick="switchMainView('SPORTS')">
+        <div class="bg-gradient-to-tr from-brand-green to-emerald-300 text-black font-black p-2 rounded-xl text-lg shadow-lg shadow-brand-green/20 group-hover:scale-105 transition">
+          <i data-lucide="flame" class="w-5 h-5 fill-black"></i>
+        </div>
+        <div>
+          <span class="text-xl font-black tracking-tight text-white">APEX<span class="text-brand-green">BET</span></span>
+          <span class="hidden sm:inline-block ml-2 text-[10px] uppercase font-bold text-slate-400 bg-brand-card px-2 py-0.5 rounded border border-brand-border">DraftKings Odds</span>
+        </div>
       </div>
-      <div id="tickerItems" class="flex items-center gap-6 overflow-x-auto whitespace-nowrap text-slate-300 scrollbar-none text-[11px]">
-        <span class="text-slate-500">Connecting to live odds & player prop feed...</span>
+
+      <!-- Main Hub Switcher -->
+      <div class="flex items-center gap-1 bg-brand-dark p-1 rounded-xl border border-brand-border">
+        <button onclick="switchMainView('SPORTS')" id="hubSportsBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-brand-card text-brand-green shadow-sm">
+          <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+          <span>Sportsbook</span>
+        </button>
+        <button onclick="switchMainView('CASINO')" id="hubCasinoBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5">
+          <i data-lucide="dices" class="w-3.5 h-3.5"></i>
+          <span>Casino</span>
+          <span class="bg-amber-500/20 text-amber-400 text-[9px] px-1.5 py-0.2 rounded font-black border border-amber-500/30">3 GAMES</span>
+        </button>
       </div>
-      <div class="hidden md:flex items-center gap-2 text-slate-400 shrink-0 font-medium">
-        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-green"></i>
-        <span>Vercel Live</span>
+
+      <!-- Sports Nav Tabs (Desktop) -->
+      <nav id="sportsSubNav" class="hidden xl:flex items-center gap-1 bg-brand-dark p-1 rounded-xl border border-brand-border/80 text-xs font-semibold text-slate-300">
+        <button onclick="setSportFilter('ALL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn active-nav bg-brand-card text-brand-green font-bold" id="nav-ALL">All</button>
+        <button onclick="setSportFilter('NFL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NFL">🏈 NFL</button>
+        <button onclick="setSportFilter('NBA')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-NBA">🏀 NBA</button>
+        <button onclick="setSportFilter('EPL')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn hover:text-white" id="nav-EPL">⚽ EPL</button>
+        <button onclick="setSportFilter('LIVE')" class="px-3 py-1.5 rounded-lg transition sport-nav-btn text-red-400 flex items-center gap-1.5" id="nav-LIVE">
+          <span class="w-2 h-2 rounded-full bg-red-500 live-pulse"></span> In-Play
+        </button>
+      </nav>
+    </div>
+
+    <!-- Stats Pills & Wallet -->
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2">
+        <div id="headerSportsStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-green/40 px-3 py-1.5 rounded-xl text-xs font-bold transition">
+          <span class="text-slate-400 text-[10px] uppercase font-bold">🏈 Sports:</span>
+          <span id="sportsStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
+          <span id="sportsStatsHitRate" class="text-brand-green font-mono font-black">0.0% Win</span>
+        </div>
+        <div id="headerCasinoStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs font-bold transition">
+          <span class="text-slate-400 text-[10px] uppercase font-bold">🎰 Casino:</span>
+          <span id="casinoStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
+          <span id="casinoStatsHitRate" class="text-amber-400 font-mono font-black">0.0% Win</span>
+        </div>
       </div>
+
+      <div class="bg-brand-card border border-brand-border px-3.5 py-1.5 rounded-xl flex items-center gap-2.5 shadow-inner">
+        <div class="text-right">
+          <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Balance</div>
+          <div id="userBalance" class="font-extrabold text-brand-green text-sm">$2,500.00</div>
+        </div>
+        <button onclick="depositFunds()" class="bg-brand-green hover:bg-emerald-400 text-black font-extrabold text-xs px-2.5 py-1 rounded-lg transition shadow-sm">
+          + Deposit
+        </button>
+      </div>
+
+      <button onclick="toggleMobileBetslip()" class="lg:hidden relative bg-brand-green text-black px-3 py-2 rounded-xl font-extrabold text-xs flex items-center gap-1.5 shadow-lg shadow-brand-green/10">
+        <i data-lucide="receipt" class="w-4 h-4"></i>
+        <span>Slip</span>
+        <span id="slipCountBadgeMobile" class="bg-black text-brand-green text-[10px] px-1.5 py-0.2 rounded-full font-black">0</span>
+      </button>
     </div>
   </header>
 
-  <!-- MAIN NAVIGATION & BALANCES -->
-  <nav class="bg-brand-surface border-b border-brand-border px-3 sm:px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
-      <div class="flex items-center gap-3">
-        <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 hover:bg-brand-card rounded-lg border border-brand-border text-slate-300">
-          <i data-lucide="menu" class="w-5 h-5"></i>
-        </button>
-        <div class="flex items-center gap-2 cursor-pointer" onclick="switchMainView('SPORTS')">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-green to-emerald-400 flex items-center justify-center font-black text-black text-xl shadow-lg shadow-brand-green/20">
-            ▲
-          </div>
-          <div>
-            <h1 class="text-lg font-black tracking-wider text-white leading-tight">APEX</h1>
-            <p class="text-[9px] font-bold text-brand-green tracking-widest uppercase">SPORTSBOOK & CASINO</p>
-          </div>
-        </div>
+  <!-- MAIN CONTAINER -->
+  <div class="flex-1 flex max-w-7xl w-full mx-auto p-4 lg:p-6 gap-6">
 
-        <!-- MAIN VIEW TOGGLE (SPORTSBOOK VS CASINO) -->
-        <div class="hidden sm:flex items-center ml-4 bg-brand-dark p-1 rounded-xl border border-brand-border">
-          <button id="viewTabSports" onclick="switchMainView('SPORTS')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition active-chip">
-            <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
-            <span>SPORTSBOOK</span>
-          </button>
-          <button id="viewTabCasino" onclick="switchMainView('CASINO')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition text-slate-400 hover:text-white">
-            <i data-lucide="clover" class="w-3.5 h-3.5 text-yellow-400"></i>
-            <span>CASINO LOBBY</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- SEPARATE WIN/LOSS & HIT RATE STATS BADGES -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        
-        <!-- Sports Stats Pill -->
-        <div id="sportsStatsBadge" class="hidden xl:flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs">
-          <span class="text-slate-400 font-bold uppercase text-[10px]">Sports:</span>
-          <span class="text-brand-green font-extrabold" id="sportsWLDisplay">0W - 0L</span>
-          <span class="text-slate-500">•</span>
-          <span class="text-slate-300 font-bold" id="sportsHitRateDisplay">0% Hit</span>
-        </div>
-
-        <!-- Casino Stats Pill -->
-        <div id="casinoStatsBadge" class="hidden xl:flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs">
-          <span class="text-yellow-400 font-bold uppercase text-[10px]">Casino:</span>
-          <span class="text-brand-green font-extrabold" id="casinoWLDisplay">0W - 0L</span>
-          <span class="text-slate-500">•</span>
-          <span class="text-slate-300 font-bold" id="casinoWinRateDisplay">0% Win</span>
-        </div>
-
-        <!-- SHARED BALANCE & DEPOSIT -->
-        <div class="flex items-center bg-brand-dark border border-brand-border rounded-xl px-2.5 sm:px-3 py-1.5 gap-2">
-          <i data-lucide="wallet" class="w-4 h-4 text-brand-green"></i>
-          <div>
-            <span class="block text-[9px] uppercase font-bold text-slate-400 leading-none">Wallet</span>
-            <span id="userBalance" class="text-xs sm:text-sm font-black text-brand-green leading-none">$2,500.00</span>
-          </div>
-          <button onclick="depositFunds()" class="ml-1 text-[11px] bg-brand-green/10 hover:bg-brand-green/20 text-brand-green border border-brand-green/30 font-extrabold px-2 py-0.5 rounded-lg transition">
-            +Add
-          </button>
-        </div>
-
-        <!-- BET SLIP BUTTON (MOBILE) -->
-        <button onclick="toggleMobileBetslip()" class="lg:hidden relative p-2 bg-brand-card hover:bg-brand-cardHover rounded-xl border border-brand-border text-white">
-          <i data-lucide="receipt" class="w-5 h-5 text-brand-green"></i>
-          <span id="mobileSlipCount" class="absolute -top-1 -right-1 bg-brand-green text-black font-black text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- MOBILE VIEW TOGGLE BAR -->
-  <div class="sm:hidden flex items-center bg-brand-surface border-b border-brand-border px-3 py-2 gap-2">
-    <button onclick="switchMainView('SPORTS')" class="flex-1 py-1.5 rounded-lg text-xs font-black text-center transition bg-brand-card text-brand-green border border-brand-border" id="mobileNavSports">
-      🏈 Sportsbook
-    </button>
-    <button onclick="switchMainView('CASINO')" class="flex-1 py-1.5 rounded-lg text-xs font-black text-center transition text-slate-400 hover:text-white" id="mobileNavCasino">
-      🎰 Casino Lobby
-    </button>
-  </div>
-
-  <!-- APPLICATION BODY WRAPPER -->
-  <div class="max-w-7xl mx-auto px-3 sm:px-4 py-4 flex-1 flex gap-5 w-full">
-
-    <!-- ==================== LEFT SIDEBAR: SPORTS & CASINO NAV ==================== -->
-    <aside id="sidebar" class="hidden lg:flex flex-col w-52 shrink-0 space-y-5">
+    <!-- ==================== VIEW 1: SPORTSBOOK ==================== -->
+    <main id="sportsMainSection" class="flex-1 min-w-0">
       
-      <!-- Sports Menu -->
-      <div class="bg-brand-surface border border-brand-border rounded-2xl p-3 space-y-1">
-        <span class="text-[10px] uppercase font-black tracking-wider text-slate-400 px-2 block mb-2">Sports Leauges</span>
-        <button onclick="setSportFilter('ALL')" id="nav-ALL" class="sport-nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition bg-brand-card text-brand-green">
-          <span class="flex items-center gap-2.5"><i data-lucide="flame" class="w-4 h-4"></i> All Matchups</span>
-        </button>
-        <button onclick="setSportFilter('NFL')" id="nav-NFL" class="sport-nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white transition">
-          <span class="flex items-center gap-2.5"><i data-lucide="shield" class="w-4 h-4 text-brand-green"></i> NFL Football</span>
-        </button>
-        <button onclick="setSportFilter('NBA')" id="nav-NBA" class="sport-nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white transition">
-          <span class="flex items-center gap-2.5"><i data-lucide="circle-dot" class="w-4 h-4 text-orange-400"></i> NBA Basketball</span>
-        </button>
-        <button onclick="setSportFilter('EPL')" id="nav-EPL" class="sport-nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white transition">
-          <span class="flex items-center gap-2.5">⚽ Premier League</span>
-        </button>
-        <button onclick="setSportFilter('LIVE')" id="nav-LIVE" class="sport-nav-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white transition">
-          <span class="flex items-center gap-2.5"><i data-lucide="radio" class="w-4 h-4 text-red-500 live-pulse"></i> In-Play Live</span>
-        </button>
+      <!-- MOBILE STATS BANNER -->
+      <div class="md:hidden mb-4 grid grid-cols-2 gap-2 text-xs font-bold">
+        <div class="bg-brand-card border border-brand-green/40 rounded-xl p-2.5">
+          <div class="text-[10px] text-slate-400 uppercase">🏈 Sportsbook Win Rate</div>
+          <div class="flex items-center justify-between mt-1">
+            <span id="sportsRecordMobile" class="text-white font-mono font-black">0W - 0L</span>
+            <span id="sportsHitRateMobile" class="text-brand-green font-mono font-black">0.0%</span>
+          </div>
+        </div>
+        <div class="bg-brand-card border border-amber-500/40 rounded-xl p-2.5">
+          <div class="text-[10px] text-slate-400 uppercase">🎰 Casino Win Rate</div>
+          <div class="flex items-center justify-between mt-1">
+            <span id="casinoRecordMobile" class="text-white font-mono font-black">0W - 0L</span>
+            <span id="casinoHitRateMobile" class="text-amber-400 font-mono font-black">0.0%</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Casino Quick Launch -->
-      <div class="bg-brand-surface border border-brand-border rounded-2xl p-3 space-y-1.5">
-        <span class="text-[10px] uppercase font-black tracking-wider text-slate-400 px-2 block mb-1">Casino Lobby</span>
-        <button onclick="switchMainView('CASINO'); switchCasinoGame('BLACKJACK');" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-brand-card hover:text-white transition">
-          <span class="flex items-center gap-2">♠️ Blackjack 21</span>
-          <span class="text-[10px] font-black text-brand-green">3:2</span>
-        </button>
-        <button onclick="switchMainView('CASINO'); switchCasinoGame('ROULETTE');" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-brand-card hover:text-white transition">
-          <span class="flex items-center gap-2">🎡 European Roulette</span>
-          <span class="text-[10px] font-black text-yellow-400">35:1</span>
-        </button>
-        <button onclick="switchMainView('CASINO'); switchCasinoGame('SLOTS');" class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:bg-brand-card hover:text-white transition">
-          <span class="flex items-center gap-2">🎰 Apex 777 Slots</span>
-          <span class="text-[10px] font-black text-orange-400">50x</span>
-        </button>
-      </div>
-
-      <!-- Quick Actions / Live Refresh -->
-      <div class="bg-brand-surface border border-brand-border rounded-2xl p-3">
-        <button onclick="fetchLiveOdds(true)" class="w-full bg-brand-card hover:bg-brand-cardHover border border-brand-border text-xs font-bold py-2 rounded-xl flex items-center justify-center gap-2 transition text-slate-200">
-          <i data-lucide="refresh-cw" id="refreshIcon" class="w-3.5 h-3.5 text-brand-green"></i>
-          <span>Sync Live Odds</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- ==================== VIEW 1: SPORTSBOOK (MATCHES, 7-DAY TABS & PROPS) ==================== -->
-    <main id="sportsMainSection" class="flex-1 min-w-0 space-y-4">
-      
-      <!-- HERO BANNER -->
-      <div class="bg-gradient-to-r from-brand-card to-brand-surface border border-brand-border rounded-2xl p-4 sm:p-5 relative overflow-hidden shadow-lg">
+      <!-- PROMO BANNER -->
+      <div class="mb-6 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-brand-card to-slate-900 p-5 border border-brand-green/30 relative overflow-hidden shadow-2xl">
         <div class="relative z-10 max-w-xl">
           <div class="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/30 text-brand-green text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2">
             <i data-lucide="target" class="w-3.5 h-3.5"></i>
             <span>DraftKings Player Props Active</span>
           </div>
           <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">NFL, NBA & Premier League Board</h2>
-          <p class="text-xs text-slate-300 mt-1">Every match features 3–4 official DraftKings prop categories with star player lines.</p>
+          <p class="text-xs text-slate-300 mt-1">Every match features 3–4 official DraftKings prop categories with real star player lines.</p>
         </div>
       </div>
 
       <!-- SEARCH & SPORT FILTER CONTROLS -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams or players (Mahomes, Allen, Henry, Tatum, Haaland)..."
+          <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams or players (Mahomes, Tatum, Haaland, Barkley)..."
             class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-green transition" />
         </div>
-
         <div class="flex xl:hidden gap-1.5 overflow-x-auto text-xs font-bold scrollbar-none">
           <button onclick="setSportFilter('ALL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap active-chip">All</button>
           <button onclick="setSportFilter('NFL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap">🏈 NFL</button>
@@ -230,7 +186,7 @@
         </div>
       </div>
 
-      <!-- 7-DAY FUTURE SCHEDULE / DATE SELECTOR BAR -->
+      <!-- 7-DAY SCHEDULE DATE SELECTOR BAR -->
       <div class="mb-4 bg-brand-surface/70 border border-brand-border rounded-2xl p-2.5 sm:p-3 shadow-md">
         <div class="flex items-center justify-between mb-2 px-1">
           <div class="flex items-center gap-1.5 text-xs font-black text-white">
@@ -239,10 +195,8 @@
           </div>
           <span id="dateFilterSummary" class="text-[11px] text-brand-green font-bold bg-brand-green/10 border border-brand-green/20 px-2.5 py-0.5 rounded-full">All Upcoming (7 Days)</span>
         </div>
-        
-        <!-- Horizontally scrollable date pill buttons -->
         <div id="datePillsContainer" class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
-          <!-- Populated dynamically via renderDateTabs() -->
+          <!-- Populated by renderDateTabs() -->
         </div>
       </div>
 
@@ -260,335 +214,221 @@
       <div id="gamesContainer" class="space-y-3">
         <div class="bg-brand-card border border-brand-border rounded-2xl p-12 text-center text-slate-400">
           <i data-lucide="loader-2" class="w-8 h-8 mx-auto animate-spin text-brand-green mb-3"></i>
-          <p class="text-sm font-semibold text-white">Loading live scores, 7-day schedule & player props...</p>
+          <p class="text-sm font-semibold text-white">Loading live scores & player props...</p>
         </div>
       </div>
     </main>
 
-    <!-- ==================== VIEW 2: CASINO (BLACKJACK, ROULETTE & SLOTS) ==================== -->
+    <!-- ==================== VIEW 2: CASINO ==================== -->
     <main id="casinoMainSection" class="hidden flex-1 min-w-0 space-y-6">
       
-      <!-- Casino Game Selector Tabs (3 Games) -->
+      <!-- Casino Game Selector Tabs -->
       <div class="flex items-center gap-2.5 border-b border-brand-border pb-4 overflow-x-auto scrollbar-none">
-        <button onclick="switchCasinoGame('BLACKJACK')" id="cTab-BLACKJACK" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition bg-brand-card border border-brand-green text-brand-green">
-          <span>♠️ Blackjack 21</span>
+        <button onclick="switchCasinoGame('BLACKJACK')" id="tabBlackjackBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 whitespace-nowrap transition">
+          <i data-lucide="spade" class="w-4 h-4 fill-black"></i>
+          <span>Blackjack 21</span>
         </button>
-        <button onclick="switchCasinoGame('ROULETTE')" id="cTab-ROULETTE" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition bg-brand-surface border border-brand-border text-slate-400 hover:text-white">
-          <span>🎡 European Roulette</span>
+        <button onclick="switchCasinoGame('ROULETTE')" id="tabRouletteBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition">
+          <i data-lucide="disc" class="w-4 h-4 text-amber-400"></i>
+          <span>Roulette</span>
         </button>
-        <button onclick="switchCasinoGame('SLOTS')" id="cTab-SLOTS" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition bg-brand-surface border border-brand-border text-slate-400 hover:text-white">
-          <span>🎰 Apex 777 Slots</span>
+        <button onclick="switchCasinoGame('SLOTS')" id="tabSlotsBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+          <span>Apex 777 Slots</span>
         </button>
       </div>
 
-      <!-- CASINO GAME 1: BLACKJACK TABLE -->
-      <div id="casinoGameBlackjack" class="bg-gradient-to-b from-[#0a2f1d] to-[#06180f] border-2 border-emerald-800/80 rounded-3xl p-5 sm:p-7 shadow-2xl relative">
-        <div class="flex items-center justify-between border-b border-emerald-700/50 pb-3 mb-6">
+      <!-- GAME 1: BLACKJACK TABLE -->
+      <div id="blackjackGameBox" class="bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between pb-4 border-b border-brand-border/60">
           <div>
-            <h3 class="text-xl font-black text-white tracking-wide flex items-center gap-2">
-              <span>♠️ High Roller Blackjack</span>
-              <span class="text-[10px] bg-brand-green/20 text-brand-green border border-brand-green/40 px-2 py-0.5 rounded-full">Pays 3:2</span>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <i data-lucide="spade" class="w-5 h-5 text-brand-green"></i> Classic Blackjack
             </h3>
-            <p class="text-xs text-emerald-300/80">Dealer stands on soft 17 • Double Down & Split available</p>
+            <p class="text-xs text-slate-400">Dealer stands on 17. Blackjack pays 3:2.</p>
           </div>
           <div class="text-right">
-            <span class="text-[10px] text-emerald-400 uppercase font-bold block">Current Hand Bet</span>
-            <span id="bjCurrentBet" class="text-lg font-black text-white">$50.00</span>
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Wager Amount</span>
+            <div id="bjBetDisplay" class="font-black text-brand-green text-base">$25.00</div>
           </div>
         </div>
 
-        <!-- Dealer Hand Area -->
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 mb-2">
-            <span>DEALER'S HAND</span>
-            <span id="dealerScoreBadge" class="bg-black/50 text-white px-2 py-0.5 rounded-md font-mono font-bold text-[11px]">Score: ?</span>
-          </div>
-          <div id="dealerCards" class="flex items-center justify-center gap-2 min-h-[105px]">
-            <div class="w-16 h-24 rounded-lg bg-emerald-950/80 border border-emerald-700 flex items-center justify-center text-slate-600 font-bold text-xs">Waiting</div>
-          </div>
+        <div class="py-6 text-center border-b border-brand-border/40">
+          <div class="text-xs font-bold text-slate-400 mb-2">DEALER HAND <span id="dealerScoreDisplay" class="ml-2 text-brand-green font-mono font-black"></span></div>
+          <div id="dealerCards" class="flex items-center justify-center gap-2 min-h-[96px]"></div>
         </div>
 
-        <!-- Center Status / Outcome Banner -->
-        <div id="bjStatusBanner" class="text-center min-h-[40px] flex items-center justify-center mb-6">
-          <span class="text-xs font-bold text-emerald-200 bg-black/40 px-4 py-1.5 rounded-full border border-emerald-600/30">
-            Select chip size below & press Deal to play
-          </span>
+        <div class="py-6 text-center">
+          <div class="text-xs font-bold text-slate-400 mb-2">YOUR HAND <span id="playerScoreDisplay" class="ml-2 text-brand-green font-mono font-black"></span></div>
+          <div id="playerCards" class="flex items-center justify-center gap-2 min-h-[96px]"></div>
+          <div id="bjStatusMsg" class="mt-4 font-black text-base text-amber-300 h-6">Choose your wager and click Deal</div>
         </div>
 
-        <!-- Player Hand Area -->
-        <div class="text-center mb-6">
-          <div class="inline-flex items-center gap-2 text-xs font-bold text-emerald-300 mb-2">
-            <span>YOUR HAND</span>
-            <span id="playerScoreBadge" class="bg-black/50 text-brand-green px-2 py-0.5 rounded-md font-mono font-bold text-[11px]">Score: 0</span>
-          </div>
-          <div id="playerCards" class="flex items-center justify-center gap-2 min-h-[105px]">
-            <div class="w-16 h-24 rounded-lg bg-emerald-950/80 border border-emerald-700 flex items-center justify-center text-slate-600 font-bold text-xs">Your Cards</div>
-          </div>
-        </div>
-
-        <!-- Chip Selectors & Controls -->
-        <div class="bg-black/40 border border-emerald-700/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-2">
-            <span class="text-[10px] uppercase font-bold text-emerald-400 mr-1">Bet:</span>
-            <button onclick="setBjChip(10)" class="bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-brand-green transition" data-amt="10">$10</button>
-            <button onclick="setBjChip(25)" class="bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-brand-green transition" data-amt="25">$25</button>
-            <button onclick="setBjChip(50)" class="bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-green text-black border border-brand-green transition active-chip" data-amt="50">$50</button>
-            <button onclick="setBjChip(100)" class="bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-brand-green transition" data-amt="100">$100</button>
-            <button onclick="setBjChip(250)" class="bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-brand-green transition" data-amt="250">$250</button>
+            <span class="text-xs text-slate-400 font-bold">Wager:</span>
+            <button onclick="setBjChip(10)" class="w-10 h-10 rounded-full font-black text-xs border border-blue-500 bg-blue-950 text-blue-300 hover:scale-105 transition">$10</button>
+            <button onclick="setBjChip(25)" class="w-10 h-10 rounded-full font-black text-xs border border-brand-green bg-emerald-950 text-brand-green hover:scale-105 transition">$25</button>
+            <button onclick="setBjChip(50)" class="w-10 h-10 rounded-full font-black text-xs border border-purple-500 bg-purple-950 text-purple-300 hover:scale-105 transition">$50</button>
+            <button onclick="setBjChip(100)" class="w-10 h-10 rounded-full font-black text-xs border border-amber-500 bg-amber-950 text-amber-300 hover:scale-105 transition">$100</button>
           </div>
-
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button id="btnBjDeal" onclick="startBlackjackHand()" class="flex-1 sm:flex-none px-6 py-2.5 bg-brand-green hover:bg-emerald-400 text-black font-black text-xs rounded-xl shadow-lg shadow-brand-green/20 transition">
-              DEAL HAND
-            </button>
-            <button id="btnBjHit" onclick="blackjackHit()" disabled class="flex-1 sm:flex-none px-5 py-2.5 bg-brand-card border border-brand-border text-white font-bold text-xs rounded-xl hover:border-brand-green transition disabled:opacity-40 disabled:pointer-events-none">
-              HIT
-            </button>
-            <button id="btnBjStand" onclick="blackjackStand()" disabled class="flex-1 sm:flex-none px-5 py-2.5 bg-brand-card border border-brand-border text-white font-bold text-xs rounded-xl hover:border-brand-green transition disabled:opacity-40 disabled:pointer-events-none">
-              STAND
-            </button>
-            <button id="btnBjDouble" onclick="blackjackDouble()" disabled class="flex-1 sm:flex-none px-4 py-2.5 bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 font-bold text-xs rounded-xl hover:bg-yellow-500/30 transition disabled:opacity-40 disabled:pointer-events-none">
-              2X DOUBLE
-            </button>
+            <button onclick="startBlackjackHand()" id="bjDealBtn" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl font-black text-xs bg-brand-green hover:bg-emerald-400 text-black uppercase transition">Deal</button>
+            <button onclick="blackjackHit()" id="bjHitBtn" disabled class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs bg-slate-800 text-slate-500 cursor-not-allowed uppercase transition">Hit</button>
+            <button onclick="blackjackStand()" id="bjStandBtn" disabled class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs bg-slate-800 text-slate-500 cursor-not-allowed uppercase transition">Stand</button>
+            <button onclick="blackjackDouble()" id="bjDoubleBtn" disabled class="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs bg-slate-800 text-slate-500 cursor-not-allowed uppercase transition">2x</button>
           </div>
         </div>
       </div>
 
-      <!-- CASINO GAME 2: ROULETTE TABLE -->
-      <div id="casinoGameRoulette" class="hidden bg-gradient-to-b from-[#1c130b] to-[#0d0905] border-2 border-amber-900/80 rounded-3xl p-5 sm:p-7 shadow-2xl relative">
-        <div class="flex items-center justify-between border-b border-amber-800/40 pb-3 mb-6">
+      <!-- GAME 2: ROULETTE TABLE -->
+      <div id="rouletteGameBox" class="hidden bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-brand-border/60">
           <div>
-            <h3 class="text-xl font-black text-white tracking-wide flex items-center gap-2">
-              <span>🎡 European Roulette</span>
-              <span class="text-[10px] bg-yellow-400/20 text-yellow-300 border border-yellow-400/40 px-2 py-0.5 rounded-full">Single Zero (2.7% Edge)</span>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <i data-lucide="disc" class="w-5 h-5 text-amber-400"></i> European Roulette
             </h3>
-            <p class="text-xs text-amber-300/80">Pick Red, Black, Odd, Even, Dozens, or exact numbers (35:1)</p>
+            <p class="text-xs text-slate-400">Select bet, pick chip size, and click Spin.</p>
           </div>
           <div class="text-right">
-            <span class="text-[10px] text-amber-400 uppercase font-bold block">Selected Bet</span>
-            <span id="rouletteCurrentBetDisplay" class="text-lg font-black text-white">$25 on RED</span>
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Selected Bet</span>
+            <div id="rouletteBetDisplay" class="font-black text-brand-green text-sm">Red ($25)</div>
           </div>
         </div>
 
-        <!-- Roulette Wheel Simulation Display -->
-        <div class="text-center my-6">
-          <div class="inline-flex flex-col items-center justify-center w-36 h-36 rounded-full bg-gradient-to-tr from-amber-950 via-zinc-900 to-amber-900 border-4 border-amber-600/70 shadow-2xl shadow-amber-600/20 relative mx-auto">
-            <span class="text-[10px] font-black uppercase text-amber-400">Winning Number</span>
-            <span id="rouletteResultNumber" class="text-4xl font-black text-white font-mono mt-0.5">--</span>
-            <span id="rouletteResultColor" class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Ready</span>
+        <div class="flex flex-col items-center justify-center py-6 bg-brand-dark rounded-2xl border border-brand-border text-center">
+          <div id="wheelGraphic" class="w-24 h-24 rounded-full border-4 border-amber-400 bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center text-3xl font-black font-mono shadow-xl transition-all">
+            <span id="rouletteResultNumber" class="text-white">--</span>
           </div>
-          <p id="rouletteOutcomeText" class="text-xs font-bold text-amber-200 mt-4 min-h-[20px]">
-            Choose your bet on the table below and click SPIN
-          </p>
+          <div id="rouletteStatusMsg" class="mt-4 font-black text-sm text-slate-300">Choose your wager and click Spin</div>
         </div>
 
-        <!-- Roulette Betting Board -->
-        <div class="space-y-2.5 max-w-2xl mx-auto">
-          <!-- Outside Bets (Even-money) -->
-          <div class="grid grid-cols-4 gap-2 text-xs font-bold text-center">
-            <button onclick="selectRouletteBet('RED', 'Red (1:1)', 1)" class="r-bet-btn p-3 rounded-xl bg-red-700/80 hover:bg-red-600 border border-red-500 text-white font-black transition">
-              RED (1:1)
-            </button>
-            <button onclick="selectRouletteBet('BLACK', 'Black (1:1)', 1)" class="r-bet-btn p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white font-black transition">
-              BLACK (1:1)
-            </button>
-            <button onclick="selectRouletteBet('EVEN', 'Even (1:1)', 1)" class="r-bet-btn p-3 rounded-xl bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-200 transition">
-              EVEN (1:1)
-            </button>
-            <button onclick="selectRouletteBet('ODD', 'Odd (1:1)', 1)" class="r-bet-btn p-3 rounded-xl bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-200 transition">
-              ODD (1:1)
-            </button>
+        <div class="space-y-2">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onclick="selectRouletteBet('RED', 'Red (1:1)', 1)" class="roulette-opt-btn bg-red-600 hover:bg-red-500 text-white font-black py-3 rounded-xl text-xs uppercase shadow transition">RED (1:1)</button>
+            <button onclick="selectRouletteBet('BLACK', 'Black (1:1)', 1)" class="roulette-opt-btn bg-slate-900 border border-slate-700 hover:border-white text-white font-black py-3 rounded-xl text-xs uppercase shadow transition">BLACK (1:1)</button>
+            <button onclick="selectRouletteBet('EVEN', 'Even (1:1)', 1)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-black py-3 rounded-xl text-xs uppercase transition">EVEN (1:1)</button>
+            <button onclick="selectRouletteBet('ODD', 'Odd (1:1)', 1)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-black py-3 rounded-xl text-xs uppercase transition">ODD (1:1)</button>
           </div>
-
-          <!-- Dozens (2:1) -->
-          <div class="grid grid-cols-3 gap-2 text-xs font-bold text-center">
-            <button onclick="selectRouletteBet('1ST12', '1st 12 (1-12)', 2)" class="r-bet-btn p-2.5 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition">
-              1st 12 (2:1)
-            </button>
-            <button onclick="selectRouletteBet('2ND12', '2nd 12 (13-24)', 2)" class="r-bet-btn p-2.5 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition">
-              2nd 12 (2:1)
-            </button>
-            <button onclick="selectRouletteBet('3RD12', '3rd 12 (25-36)', 2)" class="r-bet-btn p-2.5 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition">
-              3rd 12 (2:1)
-            </button>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button onclick="selectRouletteBet('LOW', '1-18 (Low)', 1)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-bold py-2.5 rounded-xl text-xs transition">1 to 18</button>
+            <button onclick="selectRouletteBet('HIGH', '19-36 (High)', 1)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-bold py-2.5 rounded-xl text-xs transition">19 to 36</button>
+            <button onclick="selectRouletteBet('1ST12', '1st 12 (2:1)', 2)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-bold py-2.5 rounded-xl text-xs transition">1st 12 (2:1)</button>
+            <button onclick="selectRouletteBet('2ND12', '2nd 12 (2:1)', 2)" class="roulette-opt-btn bg-brand-surface border border-brand-border hover:border-brand-green text-white font-bold py-2.5 rounded-xl text-xs transition">2nd 12 (2:1)</button>
           </div>
-
-          <!-- Direct Straight-Up Numbers 0 to 12 sample quick pick -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-mono font-bold scrollbar-none">
-            <button onclick="selectRouletteBet('NUM_0', 'Zero #0', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-emerald-700 text-white shrink-0">#0 (35:1)</button>
-            <button onclick="selectRouletteBet('NUM_7', 'Lucky #7', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-red-700 text-white shrink-0">#7 (35:1)</button>
-            <button onclick="selectRouletteBet('NUM_11', 'Number #11', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-zinc-800 text-white shrink-0">#11 (35:1)</button>
-            <button onclick="selectRouletteBet('NUM_17', 'Number #17', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-zinc-800 text-white shrink-0">#17 (35:1)</button>
-            <button onclick="selectRouletteBet('NUM_23', 'Number #23', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-red-700 text-white shrink-0">#23 (35:1)</button>
-            <button onclick="selectRouletteBet('NUM_32', 'Number #32', 35)" class="r-bet-btn px-2.5 py-1.5 rounded-lg bg-red-700 text-white shrink-0">#32 (35:1)</button>
+          <div class="pt-1">
+            <button onclick="selectRouletteBet('0', 'Green 0 (35:1)', 35)" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2 rounded-xl text-xs uppercase transition">Green Zero (35:1)</button>
           </div>
         </div>
 
-        <!-- Chip Selectors & Spin Button -->
-        <div class="mt-6 bg-black/40 border border-amber-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-2">
-            <span class="text-[10px] uppercase font-bold text-amber-400 mr-1">Chip:</span>
-            <button onclick="setRouletteChip(10)" class="r-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-yellow-400 transition" data-amt="10">$10</button>
-            <button onclick="setRouletteChip(25)" class="r-chip px-3 py-1.5 rounded-full text-xs font-black bg-yellow-400 text-black border border-yellow-400 transition active-chip" data-amt="25">$25</button>
-            <button onclick="setRouletteChip(50)" class="r-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-yellow-400 transition" data-amt="50">$50</button>
-            <button onclick="setRouletteChip(100)" class="r-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-yellow-400 transition" data-amt="100">$100</button>
+            <span class="text-xs text-slate-400 font-bold">Wager:</span>
+            <button onclick="setRouletteChip(10)" class="w-10 h-10 rounded-full font-black text-xs border border-blue-500 bg-blue-950 text-blue-300">$10</button>
+            <button onclick="setRouletteChip(25)" class="w-10 h-10 rounded-full font-black text-xs border border-brand-green bg-emerald-950 text-brand-green">$25</button>
+            <button onclick="setRouletteChip(50)" class="w-10 h-10 rounded-full font-black text-xs border border-purple-500 bg-purple-950 text-purple-300">$50</button>
+            <button onclick="setRouletteChip(100)" class="w-10 h-10 rounded-full font-black text-xs border border-amber-500 bg-amber-950 text-amber-300">$100</button>
           </div>
+          <button onclick="spinRoulette()" id="rouletteSpinBtn" class="w-full sm:w-auto px-8 py-3 rounded-xl font-black text-xs bg-amber-400 hover:bg-amber-300 text-black uppercase shadow-lg shadow-amber-400/20 transition">Spin Wheel</button>
+        </div>
+      </div>
 
-          <button id="btnSpinRoulette" onclick="spinRoulette()" class="w-full sm:w-auto px-8 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs rounded-xl shadow-lg shadow-yellow-400/20 transition flex items-center justify-center gap-2">
-            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
-            <span>SPIN WHEEL</span>
+      <!-- GAME 3: APEX 777 SLOTS -->
+      <div id="slotsGameBox" class="hidden bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-brand-border/60">
+          <div>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-purple-400"></i> Apex 777 Lucky Slots
+            </h3>
+            <p class="text-xs text-slate-400">Match 3 Lucky 7s for the 50x Mega Jackpot!</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Spin Wager</span>
+            <div id="slotBetDisplay" class="font-black text-brand-green text-base">$25.00</div>
+          </div>
+        </div>
+
+        <div class="py-8 bg-brand-dark rounded-2xl border-2 border-brand-border/80 flex items-center justify-center gap-3 sm:gap-6 shadow-inner">
+          <div id="reel1" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl"><span>7️⃣</span></div>
+          <div id="reel2" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl"><span>7️⃣</span></div>
+          <div id="reel3" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl"><span>7️⃣</span></div>
+        </div>
+        <div id="slotStatusMsg" class="text-center font-black text-sm text-slate-300 h-5">Hit Spin to play!</div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] bg-brand-surface p-3 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300"><span>7️⃣ 7️⃣ 7️⃣</span> <span class="text-brand-green">50x</span></div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300"><span>💎 💎 💎</span> <span class="text-brand-green">25x</span></div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300"><span>🔔 🔔 🔔</span> <span class="text-brand-green">15x</span></div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300"><span>🍒 🍒 🍒</span> <span class="text-brand-green">5x</span></div>
+        </div>
+
+        <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400 font-bold">Wager:</span>
+            <button onclick="setSlotChip(10)" class="w-10 h-10 rounded-full font-black text-xs border border-blue-500 bg-blue-950 text-blue-300 hover:scale-105 transition">$10</button>
+            <button onclick="setSlotChip(25)" class="w-10 h-10 rounded-full font-black text-xs border border-brand-green bg-emerald-950 text-brand-green hover:scale-105 transition">$25</button>
+            <button onclick="setSlotChip(50)" class="w-10 h-10 rounded-full font-black text-xs border border-purple-500 bg-purple-950 text-purple-300 hover:scale-105 transition">$50</button>
+            <button onclick="setSlotChip(100)" class="w-10 h-10 rounded-full font-black text-xs border border-amber-500 bg-amber-950 text-amber-300 hover:scale-105 transition">$100</button>
+          </div>
+          <button onclick="spinSlots()" id="slotSpinBtn" class="w-full sm:w-auto px-8 py-3 rounded-xl font-black text-xs bg-purple-500 hover:bg-purple-400 text-white uppercase shadow-lg shadow-purple-500/20 transition flex items-center justify-center gap-2">
+            <i data-lucide="sparkles" class="w-4 h-4"></i> Spin Reels
           </button>
         </div>
       </div>
-
-      <!-- CASINO GAME 3: APEX 777 CLASSIC SLOTS -->
-      <div id="casinoGameSlots" class="hidden bg-gradient-to-b from-[#25103a] to-[#11071c] border-2 border-purple-800/80 rounded-3xl p-5 sm:p-7 shadow-2xl relative">
-        <div class="flex items-center justify-between border-b border-purple-800/40 pb-3 mb-6">
-          <div>
-            <h3 class="text-xl font-black text-white tracking-wide flex items-center gap-2">
-              <span>🎰 Apex 777 Classic Slots</span>
-              <span class="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full">Top Jackpot 50x</span>
-            </h3>
-            <p class="text-xs text-purple-300/80">3-Reel Vegas Style • Match 3 symbols for massive multipliers</p>
-          </div>
-          <div class="text-right">
-            <span class="text-[10px] text-purple-400 uppercase font-bold block">Current Spin Cost</span>
-            <span id="slotBetDisplay" class="text-lg font-black text-white">$20.00</span>
-          </div>
-        </div>
-
-        <!-- 3-REEL SLOT MACHINE DISPLAY -->
-        <div class="max-w-md mx-auto my-6 bg-black/60 border-4 border-purple-600/60 rounded-3xl p-6 shadow-2xl shadow-purple-900/30">
-          <div class="grid grid-cols-3 gap-3 sm:gap-4 text-center">
-            
-            <!-- Reel 1 -->
-            <div class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-2 border-purple-500/40 rounded-2xl h-32 sm:h-36 flex items-center justify-center overflow-hidden shadow-inner relative">
-              <span id="slotReel1" class="text-5xl sm:text-6xl select-none transition-transform duration-100">7️⃣</span>
-            </div>
-
-            <!-- Reel 2 -->
-            <div class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-2 border-purple-500/40 rounded-2xl h-32 sm:h-36 flex items-center justify-center overflow-hidden shadow-inner relative">
-              <span id="slotReel2" class="text-5xl sm:text-6xl select-none transition-transform duration-100">7️⃣</span>
-            </div>
-
-            <!-- Reel 3 -->
-            <div class="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-2 border-purple-500/40 rounded-2xl h-32 sm:h-36 flex items-center justify-center overflow-hidden shadow-inner relative">
-              <span id="slotReel3" class="text-5xl sm:text-6xl select-none transition-transform duration-100">7️⃣</span>
-            </div>
-          </div>
-
-          <!-- Multiplier Paytable Highlights -->
-          <div class="mt-5 grid grid-cols-5 gap-1 text-center text-[10px] text-slate-400 border-t border-purple-800/40 pt-3">
-            <div><span class="text-base block">7️⃣7️⃣7️⃣</span><span class="font-black text-yellow-400">50x</span></div>
-            <div><span class="text-base block">💎💎💎</span><span class="font-black text-cyan-400">25x</span></div>
-            <div><span class="text-base block">🔔🔔🔔</span><span class="font-black text-amber-300">15x</span></div>
-            <div><span class="text-base block">🍇🍇🍇</span><span class="font-black text-purple-300">8x</span></div>
-            <div><span class="text-base block">🍒🍒🍒</span><span class="font-black text-red-400">5x</span></div>
-          </div>
-        </div>
-
-        <!-- Outcome Banner -->
-        <div class="text-center min-h-[30px] mb-6">
-          <p id="slotOutcomeText" class="text-xs font-bold text-purple-200">
-            Select your spin wager below and hit PULL LEVER!
-          </p>
-        </div>
-
-        <!-- Chip Selectors & Spin Lever -->
-        <div class="bg-black/40 border border-purple-800/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] uppercase font-bold text-purple-400 mr-1">Bet:</span>
-            <button onclick="setSlotChip(5)" class="slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-purple-400 transition" data-amt="5">$5</button>
-            <button onclick="setSlotChip(10)" class="slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-purple-400 transition" data-amt="10">$10</button>
-            <button onclick="setSlotChip(20)" class="slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-purple-600 text-white border border-purple-500 transition active-chip" data-amt="20">$20</button>
-            <button onclick="setSlotChip(50)" class="slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-purple-400 transition" data-amt="50">$50</button>
-            <button onclick="setSlotChip(100)" class="slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-purple-400 transition" data-amt="100">$100</button>
-          </div>
-
-          <button id="btnSpinSlots" onclick="spinSlots()" class="w-full sm:w-auto px-8 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-black text-xs rounded-xl shadow-lg shadow-purple-500/20 transition flex items-center justify-center gap-2">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>PULL LEVER & SPIN</span>
-          </button>
-        </div>
-      </div>
-
     </main>
 
-    <!-- ==================== RIGHT COLUMN: BET SLIP & MY BETS HISTORY ==================== -->
-    <aside id="betslipAside" class="hidden lg:flex flex-col w-84 xl:w-96 shrink-0 bg-brand-surface border border-brand-border rounded-2xl overflow-hidden self-start sticky top-16 shadow-xl">
-      
-      <!-- Aside Tabs (Bet Slip vs My Bets History) -->
-      <div class="flex items-center border-b border-brand-border bg-brand-dark/50">
+    <!-- ==================== RIGHT SIDEBAR: BET SLIP & MY BETS ==================== -->
+    <aside id="betslipAside" class="hidden lg:flex flex-col w-[340px] xl:w-[380px] shrink-0 bg-brand-surface border border-brand-border rounded-2xl overflow-hidden self-start sticky top-24 max-h-[calc(100vh-7rem)] shadow-2xl">
+
+      <!-- Tabs -->
+      <div class="flex border-b border-brand-border">
         <button onclick="switchAsideTab('SLIP')" id="asideTabSlip" class="flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-brand-green text-brand-green">
-          <i data-lucide="receipt" class="w-4 h-4"></i>
-          <span>BET SLIP</span>
+          <i data-lucide="receipt" class="w-4 h-4"></i> BET SLIP
           <span id="slipCountBadge" class="bg-brand-green text-black text-[10px] px-1.5 py-0.2 rounded-full font-black">0</span>
         </button>
         <button onclick="switchAsideTab('MYBETS')" id="asideTabMyBets" class="flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white">
-          <i data-lucide="history" class="w-4 h-4"></i>
-          <span>MY BETS</span>
-          <span id="placedCountBadge" class="bg-slate-800 text-slate-300 text-[10px] px-1.5 py-0.2 rounded-full">0</span>
+          <i data-lucide="history" class="w-4 h-4"></i> MY BETS
+          <span id="placedCountBadge" class="bg-brand-card text-slate-300 text-[10px] px-1.5 py-0.2 rounded-full">0</span>
         </button>
       </div>
 
-      <!-- TAB CONTENT 1: BET SLIP -->
-      <div id="asideContentSlip" class="p-3 sm:p-4 space-y-4">
-        
-        <!-- Singles vs Parlay Selector -->
-        <div class="flex items-center bg-brand-dark p-1 rounded-xl border border-brand-border text-xs font-bold">
-          <button onclick="setSlipMode('PARLAY')" id="slipModeParlay" class="flex-1 py-1.5 rounded-lg transition active-chip">
-            Parlay / SGP
-          </button>
-          <button onclick="setSlipMode('SINGLES')" id="slipModeSingles" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">
-            Straight / Singles
-          </button>
+      <!-- BET SLIP CONTENT -->
+      <div id="asideContentSlip" class="flex flex-col flex-1 overflow-hidden">
+        <div class="p-3 border-b border-brand-border/60">
+          <div class="flex items-center bg-brand-dark p-1 rounded-xl border border-brand-border text-xs font-bold">
+            <button onclick="setSlipMode('PARLAY')" id="slipModeParlay" class="flex-1 py-1.5 rounded-lg transition bg-brand-card text-brand-green shadow-sm">Parlay</button>
+            <button onclick="setSlipMode('SINGLES')" id="slipModeSingles" class="flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Singles</button>
+          </div>
         </div>
 
-        <!-- Selections List -->
-        <div id="slipItemsList" class="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
-          <!-- Populated dynamically -->
-        </div>
+        <div id="slipItemsList" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
 
-        <!-- Wager Amount & Multi-leg Summary -->
-        <div id="slipSummarySection" class="border-t border-brand-border pt-3 space-y-3">
-          
+        <div id="slipSummarySection" class="p-3 border-t border-brand-border space-y-3">
           <div class="flex items-center justify-between text-xs">
             <span class="text-slate-400 font-bold">Total Odds:</span>
             <span id="slipCombinedOdds" class="text-brand-green font-mono font-black text-sm">+0</span>
           </div>
-
           <div class="space-y-1.5">
             <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-300 font-bold">Wager Amount ($):</span>
-              <span class="text-[11px] text-slate-400">Available: <span class="text-white font-bold" id="slipAvailBalance">$2,500.00</span></span>
+              <span class="text-slate-300 font-bold">Wager ($):</span>
+              <span class="text-[11px] text-slate-400">Balance: <span class="text-white font-bold" id="slipAvailBalance">$2,500.00</span></span>
             </div>
             <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
               <input type="number" id="slipWagerInput" oninput="calculateSlipPayout()" value="50" min="1" step="5"
                 class="w-full bg-brand-card border border-brand-border rounded-xl pl-7 pr-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-brand-green transition" />
             </div>
           </div>
-
-          <!-- Quick Wager Buttons -->
           <div class="flex items-center gap-1.5 text-xs font-bold">
             <button onclick="setQuickWager(25)" class="flex-1 bg-brand-card hover:bg-brand-cardHover border border-brand-border py-1 rounded-lg text-slate-300">$25</button>
             <button onclick="setQuickWager(50)" class="flex-1 bg-brand-card hover:bg-brand-cardHover border border-brand-border py-1 rounded-lg text-slate-300">$50</button>
             <button onclick="setQuickWager(100)" class="flex-1 bg-brand-card hover:bg-brand-cardHover border border-brand-border py-1 rounded-lg text-slate-300">$100</button>
             <button onclick="setQuickWager('MAX')" class="flex-1 bg-brand-card hover:bg-brand-cardHover border border-brand-border py-1 rounded-lg text-brand-green">MAX</button>
           </div>
-
           <div class="bg-brand-dark/70 border border-brand-border rounded-xl p-3 space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <span>Potential Return:</span>
-              <span id="slipTotalPayout" class="text-white font-mono font-bold">$0.00</span>
-            </div>
-            <div class="flex justify-between text-xs font-black">
-              <span class="text-brand-green">Potential Profit:</span>
-              <span id="slipPotentialProfit" class="text-brand-green font-mono text-sm">+$0.00</span>
-            </div>
+            <div class="flex justify-between text-xs text-slate-400"><span>Potential Return:</span><span id="slipTotalPayout" class="text-white font-mono font-bold">$0.00</span></div>
+            <div class="flex justify-between text-xs font-black"><span class="text-brand-green">Potential Profit:</span><span id="slipPotentialProfit" class="text-brand-green font-mono text-sm">+$0.00</span></div>
           </div>
-
-          <!-- SUBMIT BET BUTTON (STRICT EMPTY SLIP GUARD) -->
           <button id="btnPlaceBet" onclick="placeBetSlip()" disabled
             class="w-full py-3 rounded-xl font-black text-xs tracking-wider uppercase transition shadow-lg opacity-40 pointer-events-none bg-brand-green text-black shadow-brand-green/20">
             SELECT PICKS TO BET
@@ -596,194 +436,244 @@
         </div>
       </div>
 
-      <!-- TAB CONTENT 2: MY BETS (HISTORY & SIMULATION GRADING) -->
-      <div id="asideContentMyBets" class="hidden p-3 sm:p-4 space-y-3">
+      <!-- MY BETS CONTENT -->
+      <div id="asideContentMyBets" class="hidden flex-1 overflow-y-auto p-3 space-y-3">
         <div class="flex items-center justify-between text-xs border-b border-brand-border pb-2">
-          <span class="font-bold text-slate-300">Active & Settled Bets</span>
-          <button onclick="clearBetHistory()" class="text-[10px] text-slate-500 hover:text-red-400 transition">Clear History</button>
+          <span class="font-bold text-slate-300">Placed Bets & Results</span>
+          <button onclick="clearBetHistory()" class="text-[10px] text-slate-500 hover:text-red-400 transition">Clear All</button>
         </div>
-
-        <div id="myBetsList" class="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
-          <!-- Populated dynamically via renderMyBets() -->
-        </div>
+        <div id="myBetsList"></div>
       </div>
     </aside>
-
   </div>
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast" class="fixed bottom-4 right-4 z-50 transform translate-y-24 opacity-0 transition duration-300 max-w-sm bg-brand-surface border border-brand-green/40 shadow-2xl rounded-2xl p-4 flex items-center gap-3">
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-4 right-4 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-xs bg-brand-surface border border-brand-green/40 shadow-2xl rounded-2xl p-4 flex items-center gap-3">
     <div class="w-8 h-8 rounded-xl bg-brand-green/20 border border-brand-green text-brand-green flex items-center justify-center shrink-0">
       <i data-lucide="check" class="w-4 h-4"></i>
     </div>
     <div>
-      <h4 id="toastTitle" class="text-xs font-black text-white">Bet Placed!</h4>
-      <p id="toastMessage" class="text-[11px] text-slate-300">Your wager was successfully submitted.</p>
+      <h4 id="toastTitle" class="text-xs font-black text-white">Notification</h4>
+      <p id="toastMessage" class="text-[11px] text-slate-300">Message here.</p>
     </div>
   </div>
 
   <!-- ==================== JAVASCRIPT ENGINE ==================== -->
   <script>
     // ==========================================
-    // DRAFTKINGS PLAYER PROPS DATABASE & PRESETS
+    // PROP CATEGORIES PER SPORT
     // ==========================================
     const DK_PROP_CATEGORIES = {
       NBA: ["Points", "Rebounds", "Assists", "3-Pointers Made"],
-      NFL: ["Passing Yards", "Rushing Yards", "Receiving Yards", "Anytime TD"],
+      NFL: ["Passing Yards", "Rushing Yards", "Receiving Yards", "Anytime Touchdown"],
       EPL: ["Anytime Goalscorer", "Shots on Target", "Assists", "Player to be Booked"]
     };
 
-    const REAL_STAR_PROPS = {
-      // NBA STARS
-      "Boston Celtics": [
-        { player: "Jayson Tatum", cat: "Points", line: 27.5, overOdds: -115, underOdds: -115 },
-        { player: "Jayson Tatum", cat: "Rebounds", line: 8.5, overOdds: -110, underOdds: -120 },
-        { player: "Jaylen Brown", cat: "Points", line: 24.5, overOdds: -110, underOdds: -120 },
-        { player: "Derrick White", cat: "3-Pointers Made", line: 2.5, overOdds: -130, underOdds: +100 },
-        { player: "Jrue Holiday", cat: "Assists", line: 5.5, overOdds: -115, underOdds: -115 }
-      ],
-      "Detroit Pistons": [
-        { player: "Cade Cunningham", cat: "Points", line: 22.5, overOdds: -115, underOdds: -115 },
-        { player: "Cade Cunningham", cat: "Assists", line: 7.5, overOdds: -125, underOdds: -105 },
-        { player: "Jalen Duren", cat: "Rebounds", line: 11.5, overOdds: -110, underOdds: -120 },
-        { player: "Jaden Ivey", cat: "Points", line: 16.5, overOdds: -110, underOdds: -120 }
-      ],
-      "New York Knicks": [
-        { player: "Jalen Brunson", cat: "Points", line: 28.5, overOdds: -115, underOdds: -115 },
-        { player: "Jalen Brunson", cat: "Assists", line: 6.5, overOdds: -120, underOdds: -110 },
-        { player: "Karl-Anthony Towns", cat: "Points", line: 21.5, overOdds: -115, underOdds: -115 },
-        { player: "Karl-Anthony Towns", cat: "Rebounds", line: 10.5, overOdds: -110, underOdds: -120 },
-        { player: "Mikal Bridges", cat: "3-Pointers Made", line: 2.5, overOdds: -125, underOdds: -105 }
-      ],
-      "Philadelphia 76ers": [
-        { player: "Tyrese Maxey", cat: "Points", line: 26.5, overOdds: -115, underOdds: -115 },
-        { player: "Tyrese Maxey", cat: "Assists", line: 6.5, overOdds: -110, underOdds: -120 },
-        { player: "Paul George", cat: "Points", line: 20.5, overOdds: -115, underOdds: -115 },
-        { player: "Paul George", cat: "3-Pointers Made", line: 2.5, overOdds: -120, underOdds: -110 }
-      ],
-      "Oklahoma City Thunder": [
-        { player: "Shai Gilgeous-Alexander", cat: "Points", line: 31.5, overOdds: -115, underOdds: -115 },
-        { player: "Shai Gilgeous-Alexander", cat: "Assists", line: 6.5, overOdds: -120, underOdds: -110 },
-        { player: "Chet Holmgren", cat: "Rebounds", line: 9.5, overOdds: -115, underOdds: -115 },
-        { player: "Jalen Williams", cat: "Points", line: 19.5, overOdds: -110, underOdds: -120 }
-      ],
-      "San Antonio Spurs": [
-        { player: "Victor Wembanyama", cat: "Points", line: 24.5, overOdds: -115, underOdds: -115 },
-        { player: "Victor Wembanyama", cat: "Rebounds", line: 11.5, overOdds: -125, underOdds: -105 },
-        { player: "Chris Paul", cat: "Assists", line: 8.5, overOdds: -120, underOdds: -110 },
-        { player: "Devin Vassell", cat: "Points", line: 18.5, overOdds: -110, underOdds: -120 }
-      ],
+    // ==========================================
+    // COMPLETE ROSTER DATABASE (82 TEAMS)
+    // NFL (32) + NBA (30) + EPL (20)
+    // ==========================================
+    const ROSTER_STARS = {
+      // ==========================================
+      // NFL FOOTBALL TEAMS (ALL 32 TEAMS)
+      // ==========================================
+      "Cardinals": { qb: "Kyler Murray", rb: "James Conner", wr1: "Marvin Harrison Jr.", te: "Trey McBride" },
+      "Falcons": { qb: "Kirk Cousins", rb: "Bijan Robinson", wr1: "Drake London", te: "Kyle Pitts" },
+      "Ravens": { qb: "Lamar Jackson", rb: "Derrick Henry", wr1: "Zay Flowers", te: "Mark Andrews" },
+      "Bills": { qb: "Josh Allen", rb: "James Cook", wr1: "Amari Cooper", te: "Dalton Kincaid" },
+      "Panthers": { qb: "Andy Dalton", rb: "Chuba Hubbard", wr1: "Diontae Johnson", te: "Tommy Tremble" },
+      "Bears": { qb: "Caleb Williams", rb: "D'Andre Swift", wr1: "DJ Moore", te: "Cole Kmet" },
+      "Bengals": { qb: "Joe Burrow", rb: "Chase Brown", wr1: "Ja'Marr Chase", te: "Mike Gesicki" },
+      "Browns": { qb: "Jameis Winston", rb: "Nick Chubb", wr1: "Jerry Jeudy", te: "David Njoku" },
+      "Cowboys": { qb: "Dak Prescott", rb: "Rico Dowdle", wr1: "CeeDee Lamb", te: "Jake Ferguson" },
+      "Broncos": { qb: "Bo Nix", rb: "Javonte Williams", wr1: "Courtland Sutton", te: "Greg Dulcich" },
+      "Lions": { qb: "Jared Goff", rb: "Jahmyr Gibbs", wr1: "Amon-Ra St. Brown", te: "Sam LaPorta" },
+      "Packers": { qb: "Jordan Love", rb: "Josh Jacobs", wr1: "Jayden Reed", te: "Tucker Kraft" },
+      "Texans": { qb: "C.J. Stroud", rb: "Joe Mixon", wr1: "Stefon Diggs", te: "Dalton Schultz" },
+      "Colts": { qb: "Anthony Richardson", rb: "Jonathan Taylor", wr1: "Michael Pittman Jr.", te: "Mo Alie-Cox" },
+      "Jaguars": { qb: "Trevor Lawrence", rb: "Tank Bigsby", wr1: "Brian Thomas Jr.", te: "Evan Engram" },
+      "Chiefs": { qb: "Patrick Mahomes", rb: "Kareem Hunt", wr1: "Xavier Worthy", te: "Travis Kelce" },
+      "Raiders": { qb: "Gardner Minshew", rb: "Alexander Mattison", wr1: "Jakobi Meyers", te: "Brock Bowers" },
+      "Chargers": { qb: "Justin Herbert", rb: "J.K. Dobbins", wr1: "Ladd McConkey", te: "Will Dissly" },
+      "Rams": { qb: "Matthew Stafford", rb: "Kyren Williams", wr1: "Cooper Kupp", te: "Colby Parkinson" },
+      "Dolphins": { qb: "Tua Tagovailoa", rb: "De'Von Achane", wr1: "Tyreek Hill", te: "Jonnu Smith" },
+      "Vikings": { qb: "Sam Darnold", rb: "Aaron Jones", wr1: "Justin Jefferson", te: "T.J. Hockenson" },
+      "Patriots": { qb: "Drake Maye", rb: "Rhamondre Stevenson", wr1: "DeMario Douglas", te: "Hunter Henry" },
+      "Saints": { qb: "Derek Carr", rb: "Alvin Kamara", wr1: "Chris Olave", te: "Juwan Johnson" },
+      "Giants": { qb: "Daniel Jones", rb: "Tyrone Tracy Jr.", wr1: "Malik Nabers", te: "Theo Johnson" },
+      "Jets": { qb: "Aaron Rodgers", rb: "Breece Hall", wr1: "Davante Adams", te: "Tyler Conklin" },
+      "Eagles": { qb: "Jalen Hurts", rb: "Saquon Barkley", wr1: "A.J. Brown", te: "Dallas Goedert" },
+      "Steelers": { qb: "Russell Wilson", rb: "Najee Harris", wr1: "George Pickens", te: "Pat Freiermuth" },
+      "49ers": { qb: "Brock Purdy", rb: "Jordan Mason", wr1: "Deebo Samuel", te: "George Kittle" },
+      "Seahawks": { qb: "Geno Smith", rb: "Kenneth Walker III", wr1: "DK Metcalf", te: "Noah Fant" },
+      "Buccaneers": { qb: "Baker Mayfield", rb: "Bucky Irving", wr1: "Mike Evans", te: "Cade Otton" },
+      "Titans": { qb: "Will Levis", rb: "Tony Pollard", wr1: "Calvin Ridley", te: "Chig Okonkwo" },
+      "Commanders": { qb: "Jayden Daniels", rb: "Brian Robinson Jr.", wr1: "Terry McLaurin", te: "Zach Ertz" },
 
-      // NFL STARS
-      "Kansas City Chiefs": [
-        { player: "Patrick Mahomes", cat: "Passing Yards", line: 254.5, overOdds: -115, underOdds: -115 },
-        { player: "Travis Kelce", cat: "Receiving Yards", line: 62.5, overOdds: -115, underOdds: -115 },
-        { player: "Travis Kelce", cat: "Anytime TD", line: 0.5, overOdds: +115, underOdds: -155, isTD: true },
-        { player: "Kareem Hunt", cat: "Rushing Yards", line: 58.5, overOdds: -115, underOdds: -115 }
-      ],
-      "Buffalo Bills": [
-        { player: "Josh Allen", cat: "Passing Yards", line: 238.5, overOdds: -115, underOdds: -115 },
-        { player: "Josh Allen", cat: "Rushing Yards", line: 34.5, overOdds: -115, underOdds: -115 },
-        { player: "Josh Allen", cat: "Anytime TD", line: 0.5, overOdds: -110, underOdds: -120, isTD: true },
-        { player: "James Cook", cat: "Rushing Yards", line: 65.5, overOdds: -115, underOdds: -115 },
-        { player: "Amari Cooper", cat: "Receiving Yards", line: 54.5, overOdds: -115, underOdds: -115 }
-      ],
-      "Baltimore Ravens": [
-        { player: "Lamar Jackson", cat: "Passing Yards", line: 226.5, overOdds: -115, underOdds: -115 },
-        { player: "Lamar Jackson", cat: "Rushing Yards", line: 49.5, overOdds: -115, underOdds: -115 },
-        { player: "Derrick Henry", cat: "Rushing Yards", line: 86.5, overOdds: -120, underOdds: -110 },
-        { player: "Derrick Henry", cat: "Anytime TD", line: 0.5, overOdds: -190, underOdds: +145, isTD: true },
-        { player: "Zay Flowers", cat: "Receiving Yards", line: 58.5, overOdds: -115, underOdds: -115 }
-      ],
-      "Philadelphia Eagles": [
-        { player: "Jalen Hurts", cat: "Passing Yards", line: 218.5, overOdds: -115, underOdds: -115 },
-        { player: "Saquon Barkley", cat: "Rushing Yards", line: 82.5, overOdds: -115, underOdds: -115 },
-        { player: "Saquon Barkley", cat: "Anytime TD", line: 0.5, overOdds: -175, underOdds: +135, isTD: true },
-        { player: "A.J. Brown", cat: "Receiving Yards", line: 74.5, overOdds: -115, underOdds: -115 }
-      ],
+      // ==========================================
+      // NBA BASKETBALL TEAMS (ALL 30 TEAMS)
+      // ==========================================
+      "Hawks": { g1: "Trae Young", g2: "Bogdan Bogdanović", f: "Jalen Johnson", c: "Clint Capela" },
+      "Celtics": { g1: "Jayson Tatum", g2: "Derrick White", f: "Jaylen Brown", c: "Kristaps Porziņģis" },
+      "Nets": { g1: "Cam Thomas", g2: "Dennis Schröder", f: "Cameron Johnson", c: "Nic Claxton" },
+      "Hornets": { g1: "LaMelo Ball", g2: "Brandon Miller", f: "Miles Bridges", c: "Nick Richards" },
+      "Bulls": { g1: "Zach LaVine", g2: "Coby White", f: "Patrick Williams", c: "Nikola Vučević" },
+      "Cavaliers": { g1: "Donovan Mitchell", g2: "Darius Garland", f: "Evan Mobley", c: "Jarrett Allen" },
+      "Mavericks": { g1: "Luka Dončić", g2: "Kyrie Irving", f: "Klay Thompson", c: "Dereck Lively II" },
+      "Nuggets": { g1: "Nikola Jokić", g2: "Jamal Murray", f: "Michael Porter Jr.", c: "Aaron Gordon" },
+      "Pistons": { g1: "Cade Cunningham", g2: "Jaden Ivey", f: "Tobias Harris", c: "Jalen Duren" },
+      "Warriors": { g1: "Stephen Curry", g2: "Buddy Hield", f: "Jonathan Kuminga", c: "Draymond Green" },
+      "Rockets": { g1: "Jalen Green", g2: "Fred VanVleet", f: "Jabari Smith Jr.", c: "Alperen Şengün" },
+      "Pacers": { g1: "Tyrese Haliburton", g2: "Andrew Nembhard", f: "Pascal Siakam", c: "Myles Turner" },
+      "Clippers": { g1: "James Harden", g2: "Norman Powell", f: "Terance Mann", c: "Ivica Zubac" },
+      "Lakers": { g1: "LeBron James", g2: "Austin Reaves", f: "Rui Hachimura", c: "Anthony Davis" },
+      "Grizzlies": { g1: "Ja Morant", g2: "Desmond Bane", f: "Marcus Smart", c: "Jaren Jackson Jr." },
+      "Heat": { g1: "Tyler Herro", g2: "Terry Rozier", f: "Jimmy Butler", c: "Bam Adebayo" },
+      "Bucks": { g1: "Giannis Antetokounmpo", g2: "Damian Lillard", f: "Khris Middleton", c: "Brook Lopez" },
+      "Timberwolves": { g1: "Anthony Edwards", g2: "Mike Conley", f: "Julius Randle", c: "Rudy Gobert" },
+      "Pelicans": { g1: "Zion Williamson", g2: "CJ McCollum", f: "Brandon Ingram", c: "Daniel Theis" },
+      "Knicks": { g1: "Jalen Brunson", g2: "Mikal Bridges", f: "OG Anunoby", c: "Karl-Anthony Towns" },
+      "Thunder": { g1: "Shai Gilgeous-Alexander", g2: "Jalen Williams", f: "Luguentz Dort", c: "Chet Holmgren" },
+      "Magic": { g1: "Paolo Banchero", g2: "Jalen Suggs", f: "Franz Wagner", c: "Wendell Carter Jr." },
+      "76ers": { g1: "Joel Embiid", g2: "Tyrese Maxey", f: "Paul George", c: "Andre Drummond" },
+      "Suns": { g1: "Devin Booker", g2: "Bradley Beal", f: "Kevin Durant", c: "Jusuf Nurkić" },
+      "Trail Blazers": { g1: "Anfernee Simons", g2: "Scoot Henderson", f: "Jerami Grant", c: "Deandre Ayton" },
+      "Kings": { g1: "De'Aaron Fox", g2: "Malik Monk", f: "DeMar DeRozan", c: "Domantas Sabonis" },
+      "Spurs": { g1: "Victor Wembanyama", g2: "Chris Paul", f: "Devin Vassell", c: "Zach Collins" },
+      "Raptors": { g1: "Scottie Barnes", g2: "Immanuel Quickley", f: "RJ Barrett", c: "Jakob Poeltl" },
+      "Jazz": { g1: "Lauri Markkanen", g2: "Collin Sexton", f: "John Collins", c: "Walker Kessler" },
+      "Wizards": { g1: "Jordan Poole", g2: "Bub Carrington", f: "Kyle Kuzma", c: "Jonas Valančiūnas" },
 
-      // PREMIER LEAGUE STARS
-      "Manchester City": [
-        { player: "Erling Haaland", cat: "Anytime Goalscorer", line: 0.5, overOdds: -175, underOdds: +135, isTD: true },
-        { player: "Erling Haaland", cat: "Shots on Target", line: 2.5, overOdds: -120, underOdds: -110 },
-        { player: "Phil Foden", cat: "Shots on Target", line: 1.5, overOdds: -110, underOdds: -120 },
-        { player: "Kevin De Bruyne", cat: "Assists", line: 0.5, overOdds: +140, underOdds: -185 }
-      ],
-      "Liverpool": [
-        { player: "Mohamed Salah", cat: "Anytime Goalscorer", line: 0.5, overOdds: +110, underOdds: -145, isTD: true },
-        { player: "Mohamed Salah", cat: "Shots on Target", line: 1.5, overOdds: -140, underOdds: +110 },
-        { player: "Luis Diaz", cat: "Shots on Target", line: 1.5, overOdds: +105, underOdds: -135 },
-        { player: "Trent Alexander-Arnold", cat: "Assists", line: 0.5, overOdds: +175, underOdds: -230 }
-      ],
-      "Arsenal": [
-        { player: "Bukayo Saka", cat: "Anytime Goalscorer", line: 0.5, overOdds: +160, underOdds: -210, isTD: true },
-        { player: "Bukayo Saka", cat: "Assists", line: 0.5, overOdds: +165, underOdds: -220 },
-        { player: "Kai Havertz", cat: "Shots on Target", line: 1.5, overOdds: +115, underOdds: -145 }
-      ],
-      "Chelsea": [
-        { player: "Cole Palmer", cat: "Anytime Goalscorer", line: 0.5, overOdds: +130, underOdds: -170, isTD: true },
-        { player: "Cole Palmer", cat: "Shots on Target", line: 1.5, overOdds: -115, underOdds: -115 },
-        { player: "Nicolas Jackson", cat: "Shots on Target", line: 1.5, overOdds: +110, underOdds: -140 }
-      ]
+      // ==========================================
+      // PREMIER LEAGUE SOCCER (ALL 20 TEAMS)
+      // ==========================================
+      "Arsenal": { f1: "Bukayo Saka", f2: "Kai Havertz", m: "Martin Ødegaard" },
+      "Aston Villa": { f1: "Ollie Watkins", f2: "Jhon Durán", m: "Morgan Rogers" },
+      "Bournemouth": { f1: "Evanilson", f2: "Antoine Semenyo", m: "Justin Kluivert" },
+      "Brentford": { f1: "Bryan Mbeumo", f2: "Yoane Wissa", m: "Mikkel Damsgaard" },
+      "Brighton": { f1: "Danny Welbeck", f2: "Kaoru Mitoma", m: "Georginio Rutter" },
+      "Chelsea": { f1: "Cole Palmer", f2: "Nicolas Jackson", m: "Noni Madueke" },
+      "Crystal Palace": { f1: "Jean-Philippe Mateta", f2: "Eddie Nketiah", m: "Eberechi Eze" },
+      "Everton": { f1: "Dominic Calvert-Lewin", f2: "Iliman Ndiaye", m: "Dwight McNeil" },
+      "Fulham": { f1: "Raúl Jiménez", f2: "Adama Traoré", m: "Alex Iwobi" },
+      "Ipswich": { f1: "Liam Delap", f2: "Sammie Szmodics", m: "Omari Hutchinson" },
+      "Leicester": { f1: "Jamie Vardy", f2: "Stephy Mavididi", m: "Facundo Buonanotte" },
+      "Liverpool": { f1: "Mohamed Salah", f2: "Luis Díaz", m: "Trent Alexander-Arnold" },
+      "Man City": { f1: "Erling Haaland", f2: "Phil Foden", m: "Kevin De Bruyne" },
+      "Manchester City": { f1: "Erling Haaland", f2: "Phil Foden", m: "Kevin De Bruyne" },
+      "Man United": { f1: "Marcus Rashford", f2: "Alejandro Garnacho", m: "Bruno Fernandes" },
+      "Manchester United": { f1: "Marcus Rashford", f2: "Alejandro Garnacho", m: "Bruno Fernandes" },
+      "Newcastle": { f1: "Alexander Isak", f2: "Anthony Gordon", m: "Bruno Guimarães" },
+      "Nottingham": { f1: "Chris Wood", f2: "Callum Hudson-Odoi", m: "Morgan Gibbs-White" },
+      "Southampton": { f1: "Cameron Archer", f2: "Adam Armstrong", m: "Tyler Dibling" },
+      "Tottenham": { f1: "Son Heung-min", f2: "Dominic Solanke", m: "James Maddison" },
+      "West Ham": { f1: "Jarrod Bowen", f2: "Michail Antonio", m: "Lucas Paquetá" },
+      "Wolves": { f1: "Matheus Cunha", f2: "Jørgen Strand Larsen", m: "Rayan Aït-Nouri" }
     };
 
-    function getPropsForGame(game) {
-      let props = [];
-      const homeTeam = game.homeTeam.name;
-      const awayTeam = game.awayTeam.name;
-
-      if (REAL_STAR_PROPS[awayTeam]) props = props.concat(REAL_STAR_PROPS[awayTeam]);
-      if (REAL_STAR_PROPS[homeTeam]) props = props.concat(REAL_STAR_PROPS[homeTeam]);
-
-      if (props.length === 0) {
-        if (game.sport === "NBA") {
-          props = [
-            { player: `${game.awayTeam.shortName} Top Scorer`, cat: "Points", line: 24.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.awayTeam.shortName} Playmaker`, cat: "Assists", line: 6.5, overOdds: -110, underOdds: -120 },
-            { player: `${game.homeTeam.shortName} Star Guard`, cat: "Points", line: 26.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.homeTeam.shortName} Center`, cat: "Rebounds", line: 10.5, overOdds: -120, underOdds: -110 },
-            { player: `${game.homeTeam.shortName} Sharpshooter`, cat: "3-Pointers Made", line: 2.5, overOdds: -125, underOdds: -105 }
-          ];
-        } else if (game.sport === "NFL") {
-          props = [
-            { player: `${game.awayTeam.shortName} Starting QB`, cat: "Passing Yards", line: 235.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.awayTeam.shortName} Lead RB`, cat: "Rushing Yards", line: 64.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.homeTeam.shortName} Starting QB`, cat: "Passing Yards", line: 245.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.homeTeam.shortName} WR1`, cat: "Receiving Yards", line: 68.5, overOdds: -115, underOdds: -115 },
-            { player: `${game.homeTeam.shortName} Lead RB`, cat: "Anytime TD", line: 0.5, overOdds: -125, underOdds: -105, isTD: true }
-          ];
-        } else {
-          props = [
-            { player: `${game.awayTeam.shortName} Striker`, cat: "Anytime Goalscorer", line: 0.5, overOdds: +150, underOdds: -200, isTD: true },
-            { player: `${game.awayTeam.shortName} Winger`, cat: "Shots on Target", line: 1.5, overOdds: +115, underOdds: -145 },
-            { player: `${game.homeTeam.shortName} Striker`, cat: "Anytime Goalscorer", line: 0.5, overOdds: +125, underOdds: -165, isTD: true },
-            { player: `${game.homeTeam.shortName} Attacker`, cat: "Shots on Target", line: 1.5, overOdds: -110, underOdds: -120 },
-            { player: `${game.homeTeam.shortName} Playmaker`, cat: "Assists", line: 0.5, overOdds: +180, underOdds: -240 }
-          ];
+    // SMART TEAM LOOKUP — matches by full name, short name, or nickname
+    function findRoster(fullName, shortName) {
+      const f = (fullName || "").toLowerCase().trim();
+      const s = (shortName || "").toLowerCase().trim();
+      for (const [key, roster] of Object.entries(ROSTER_STARS)) {
+        const k = key.toLowerCase();
+        if (f.includes(k) || s === k || s.includes(k) || k.includes(s)) {
+          return { key, ...roster };
         }
+      }
+      return null;
+    }
+
+    // GENERATE PROPS PER GAME FROM ROSTER
+    function getPropsForGame(game) {
+      const props = [];
+      const aR = findRoster(game.awayTeam.name, game.awayTeam.shortName);
+      const hR = findRoster(game.homeTeam.name, game.homeTeam.shortName);
+
+      const aN = aR || { qb:"Away QB", rb:"Away RB", wr1:"Away WR", te:"Away TE", g1:"Away Star", g2:"Away Guard", f:"Away Forward", c:"Away Center", f1:"Away Striker", f2:"Away Winger", m:"Away Playmaker" };
+      const hN = hR || { qb:"Home QB", rb:"Home RB", wr1:"Home WR", te:"Home TE", g1:"Home Star", g2:"Home Guard", f:"Home Forward", c:"Home Center", f1:"Home Striker", f2:"Home Winger", m:"Home Playmaker" };
+
+      if (game.sport === 'NFL') {
+        props.push(
+          { player: aN.qb, team: game.awayTeam.shortName, cat: "Passing Yards", line: 242.5, over: -115, under: -115 },
+          { player: hN.qb, team: game.homeTeam.shortName, cat: "Passing Yards", line: 248.5, over: -115, under: -115 },
+          { player: aN.rb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 68.5, over: -115, under: -115 },
+          { player: hN.rb, team: game.homeTeam.shortName, cat: "Rushing Yards", line: 72.5, over: -115, under: -115 },
+          { player: aN.wr1, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 68.5, over: -115, under: -115 },
+          { player: hN.wr1, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 74.5, over: -115, under: -115 },
+          { player: aN.te, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 48.5, over: -110, under: -120 },
+          { player: hN.te, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 52.5, over: -115, under: -115 },
+          { player: aN.rb, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -110, isSingle: true },
+          { player: hN.rb, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -125, isSingle: true },
+          { player: aN.wr1, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +125, isSingle: true },
+          { player: hN.te, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +160, isSingle: true }
+        );
+      } else if (game.sport === 'NBA') {
+        props.push(
+          { player: aN.g1, team: game.awayTeam.shortName, cat: "Points", line: 26.5, over: -115, under: -115 },
+          { player: hN.g1, team: game.homeTeam.shortName, cat: "Points", line: 27.5, over: -115, under: -115 },
+          { player: aN.g2, team: game.awayTeam.shortName, cat: "Points", line: 21.5, over: -110, under: -120 },
+          { player: hN.c, team: game.homeTeam.shortName, cat: "Points", line: 22.5, over: -115, under: -115 },
+          { player: aN.c, team: game.awayTeam.shortName, cat: "Rebounds", line: 10.5, over: -115, under: -115 },
+          { player: hN.c, team: game.homeTeam.shortName, cat: "Rebounds", line: 11.5, over: -120, under: -110 },
+          { player: aN.g1, team: game.awayTeam.shortName, cat: "Rebounds", line: 7.5, over: -110, under: -120 },
+          { player: hN.f, team: game.homeTeam.shortName, cat: "Rebounds", line: 6.5, over: -115, under: -115 },
+          { player: aN.g1, team: game.awayTeam.shortName, cat: "Assists", line: 6.5, over: -115, under: -115 },
+          { player: hN.g1, team: game.homeTeam.shortName, cat: "Assists", line: 7.5, over: -110, under: -120 },
+          { player: aN.f, team: game.awayTeam.shortName, cat: "Assists", line: 4.5, over: -125, under: -105 },
+          { player: hN.c, team: game.homeTeam.shortName, cat: "Assists", line: 5.5, over: -115, under: -115 },
+          { player: aN.g1, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 3.5, over: +110, under: -140 },
+          { player: hN.g1, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -125, under: -105 },
+          { player: aN.g2, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -115, under: -115 },
+          { player: hN.f, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 1.5, over: -145, under: +115 }
+        );
+      } else {
+        props.push(
+          { player: aN.f1, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +160, isSingle: true },
+          { player: hN.f1, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +140, isSingle: true },
+          { player: aN.f2, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +220, isSingle: true },
+          { player: hN.f2, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +190, isSingle: true },
+          { player: aN.f1, team: game.awayTeam.shortName, cat: "Shots on Target", line: 1.5, over: -110, under: -120 },
+          { player: hN.f1, team: game.homeTeam.shortName, cat: "Shots on Target", line: 1.5, over: -125, under: -105 },
+          { player: aN.f2, team: game.awayTeam.shortName, cat: "Shots on Target", line: 0.5, over: -150, under: +115 },
+          { player: hN.m, team: game.homeTeam.shortName, cat: "Shots on Target", line: 0.5, over: -140, under: +110 },
+          { player: aN.m, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +190, under: -260 },
+          { player: hN.m, team: game.homeTeam.shortName, cat: "Assists", line: 0.5, over: +170, under: -230 },
+          { player: aN.f2, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +240, under: -320 },
+          { player: aN.f1, team: game.awayTeam.shortName, cat: "Player to be Booked", line: "Yes", over: +350, isSingle: true },
+          { player: hN.m, team: game.homeTeam.shortName, cat: "Player to be Booked", line: "Yes", over: +375, isSingle: true }
+        );
       }
       return props;
     }
 
-    // APP GLOBAL STATE WITH SEPARATE STATS
+    // ==========================================
+    // APP GLOBAL STATE
+    // ==========================================
     let liveGames = [];
     let expandedProps = new Set();
     let propCategoryFilters = {};
     let currentFilter = "ALL";
     let selectedDateKey = "ALL";
     let searchQuery = "";
-    let userBalance = parseFloat(localStorage.getItem("apex_balance") || "2500.00");
     let betSlip = [];
-    let myPlacedBets = JSON.parse(localStorage.getItem("apex_placed_bets") || "[]");
-
-    // SEPARATE STATS FOR SPORTSBOOK AND CASINO
-    let sportsStats = JSON.parse(localStorage.getItem("apex_sports_stats") || JSON.stringify({ wins: 0, losses: 0, netProfit: 0 }));
-    let casinoStats = JSON.parse(localStorage.getItem("apex_casino_stats") || JSON.stringify({ wins: 0, losses: 0, netProfit: 0 }));
-
     let slipMode = "PARLAY";
     let activeAsideTab = "SLIP";
+    let userBalance = parseFloat(localStorage.getItem("apex_balance") || "2500.00");
+    let myPlacedBets = JSON.parse(localStorage.getItem("apex_placed_bets") || "[]");
+    let sportsStats = JSON.parse(localStorage.getItem("apex_sports_stats") || '{"wins":0,"losses":0,"netProfit":0}');
+    let casinoStats = JSON.parse(localStorage.getItem("apex_casino_stats") || '{"wins":0,"losses":0,"netProfit":0}');
 
-    // DATE HELPERS FOR 7-DAY SCHEDULE
+    // --- CASINO STATE ---
+    let activeCasinoGame = "BLACKJACK";
+    let bjWager = 25; let bjDeck = []; let bjPlayerHand = []; let bjDealerHand = []; let bjGameInProgress = false;
+    let rWager = 25; let rSelectedBet = "RED"; let rSelectedBetName = "Red (1:1)"; let rMultiplier = 1; let rIsSpinning = false;
+    let slotWager = 25; let slotIsSpinning = false;
+    const SLOT_SYMBOLS = ["7️⃣","💎","🔔","🍒","🍋","⭐"];
+
+    // ==========================================
+    // DATE HELPERS
+    // ==========================================
     function getDateKey(d) {
       const y = d.getFullYear();
       const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -791,161 +681,133 @@
       return `${y}${m}${day}`;
     }
 
-    // ODDS MATH HELPERS
+    function formatMatchTime(iso, shortDetail) {
+      if (!iso) return shortDetail || "Scheduled";
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' }) +
+               " • " + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      } catch (e) { return shortDetail || "Upcoming"; }
+    }
+
+    // ==========================================
+    // ODDS HELPERS
+    // ==========================================
     function toDecimalOdds(americanOdds) {
-      const num = parseInt(americanOdds, 10);
-      if (isNaN(num)) return 1.91;
-      return num > 0 ? (num / 100) + 1 : (100 / Math.abs(num)) + 1;
+      const n = parseInt(americanOdds, 10);
+      if (isNaN(n)) return 1.91;
+      return n > 0 ? (n / 100) + 1 : (100 / Math.abs(n)) + 1;
     }
 
     function formatOdds(odds) {
-      const num = parseInt(odds, 10);
-      if (isNaN(num)) return "-110";
-      return num > 0 ? `+${num}` : `${num}`;
+      const n = parseInt(odds, 10);
+      if (isNaN(n)) return "-110";
+      return n > 0 ? `+${n}` : `${n}`;
     }
 
-    function formatMatchTime(isoString, shortDetail) {
-      if (!isoString) return shortDetail || "Scheduled";
-      try {
-        const d = new Date(isoString);
-        return d.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' }) + 
-               " • " + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      } catch (e) {
-        return shortDetail || "Upcoming";
-      }
-    }
-
-    // UPDATE BOTH SEPARATE STATS DISPLAYS
+    // ==========================================
+    // STATS DISPLAY
+    // ==========================================
     function updateStatsDisplay() {
-      // 1. SPORTS STATS
       const sTotal = sportsStats.wins + sportsStats.losses;
-      const sRate = sTotal > 0 ? Math.round((sportsStats.wins / sTotal) * 100) : 0;
-      document.getElementById("sportsWLDisplay").textContent = `${sportsStats.wins}W - ${sportsStats.losses}L`;
-      document.getElementById("sportsHitRateDisplay").textContent = `${sRate}% Hit`;
-
-      // 2. CASINO STATS
+      const sRate = sTotal > 0 ? ((sportsStats.wins / sTotal) * 100).toFixed(1) : "0.0";
       const cTotal = casinoStats.wins + casinoStats.losses;
-      const cRate = cTotal > 0 ? Math.round((casinoStats.wins / cTotal) * 100) : 0;
-      document.getElementById("casinoWLDisplay").textContent = `${casinoStats.wins}W - ${casinoStats.losses}L`;
-      document.getElementById("casinoWinRateDisplay").textContent = `${cRate}% Win`;
+      const cRate = cTotal > 0 ? ((casinoStats.wins / cTotal) * 100).toFixed(1) : "0.0";
+
+      const sRecord = `${sportsStats.wins}W - ${sportsStats.losses}L`;
+      const cRecord = `${casinoStats.wins}W - ${casinoStats.losses}L`;
+
+      ["sportsStatsRecord", "sportsRecordMobile"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = sRecord; });
+      ["sportsStatsHitRate", "sportsHitRateMobile"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = `${sRate}% Win`; });
+      ["casinoStatsRecord", "casinoRecordMobile"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = cRecord; });
+      ["casinoStatsHitRate", "casinoHitRateMobile"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = `${cRate}% Win`; });
 
       localStorage.setItem("apex_sports_stats", JSON.stringify(sportsStats));
       localStorage.setItem("apex_casino_stats", JSON.stringify(casinoStats));
     }
 
     // ==========================================
-    // 7-DAY SCHEDULE FETCH ENGINE (ESPN)
+    // LIVE SCORES FETCH — 7 DAYS (ESPN API)
     // ==========================================
     async function fetchLiveOdds(isManual = false) {
-      const refreshIcon = document.getElementById("refreshIcon");
-      if (refreshIcon) refreshIcon.classList.add("animate-spin");
+      const refreshIcons = document.querySelectorAll(".refresh-icon");
+      refreshIcons.forEach(i => i.classList.add("animate-spin"));
 
       try {
-        // Build 7-day query keys (Today through +6 days)
         const dates = [];
         const now = new Date();
         for (let i = 0; i < 7; i++) {
-          const d = new Date();
-          d.setDate(now.getDate() + i);
+          const d = new Date(); d.setDate(now.getDate() + i);
           dates.push(getDateKey(d));
         }
 
         const requests = [];
-
-        // 1. NBA: query each of the next 7 days to get the full week of basketball
-        dates.forEach(dStr => {
-          requests.push(
-            fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${dStr}`)
-              .then(r => r.json())
-              .then(data => ({ sport: "NBA", data }))
-              .catch(() => null)
-          );
-        });
-
-        // 2. NFL: fetch current scoreboard + future weekend slates
+        // NBA: one fetch per day (the cleanest way to get all 7 days)
+        dates.forEach(ds => requests.push(
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${ds}`)
+            .then(r => r.json()).then(data => ({ sport: "NBA", data })).catch(() => null)
+        ));
+        // NFL: current + per-day
         requests.push(
-          fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard")
-            .then(r => r.json())
-            .then(data => ({ sport: "NFL", data }))
-            .catch(() => null)
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`)
+            .then(r => r.json()).then(data => ({ sport: "NFL", data })).catch(() => null)
         );
-        dates.forEach(dStr => {
-          requests.push(
-            fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${dStr}`)
-              .then(r => r.json())
-              .then(data => ({ sport: "NFL", data }))
-              .catch(() => null)
-          );
-        });
-
-        // 3. EPL: fetch current scoreboard + future fixtures
+        dates.forEach(ds => requests.push(
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=${ds}`)
+            .then(r => r.json()).then(data => ({ sport: "NFL", data })).catch(() => null)
+        ));
+        // EPL: current + per-day
         requests.push(
-          fetch("https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard")
-            .then(r => r.json())
-            .then(data => ({ sport: "EPL", data }))
-            .catch(() => null)
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard`)
+            .then(r => r.json()).then(data => ({ sport: "EPL", data })).catch(() => null)
         );
-        dates.forEach(dStr => {
-          requests.push(
-            fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=${dStr}`)
-              .then(r => r.json())
-              .then(data => ({ sport: "EPL", data }))
-              .catch(() => null)
-          );
-        });
+        dates.forEach(ds => requests.push(
+          fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=${ds}`)
+            .then(r => r.json()).then(data => ({ sport: "EPL", data })).catch(() => null)
+        ));
 
         const responses = await Promise.all(requests);
         const parsed = [];
-        const seenGameIds = new Set();
+        const seenIds = new Set();
 
-        const processLeagueEvents = (data, sport) => {
-          if (!data || !data.events) return;
-          data.events.forEach(event => {
-            if (seenGameIds.has(event.id)) return;
+        responses.forEach(res => {
+          if (!res || !res.data || !res.data.events) return;
+          const sport = res.sport;
 
-            const isCompleted = event.status?.type?.completed === true || 
-                                event.status?.type?.state === 'post' || 
-                                event.status?.type?.name === 'STATUS_FINAL';
+          res.data.events.forEach(event => {
+            if (seenIds.has(event.id)) return;
+            const isCompleted = event.status?.type?.completed === true ||
+              event.status?.type?.state === 'post' || event.status?.type?.name === 'STATUS_FINAL';
             if (isCompleted) return;
 
             const comp = event.competitions && event.competitions[0];
             if (!comp) return;
-
-            seenGameIds.add(event.id);
+            seenIds.add(event.id);
 
             const home = comp.competitors.find(c => c.homeAway === 'home') || comp.competitors[0];
             const away = comp.competitors.find(c => c.homeAway === 'away') || comp.competitors[1];
-            const oddsObj = comp.odds && comp.odds[0] ? comp.odds[0] : null;
+            const odds = comp.odds && comp.odds[0] ? comp.odds[0] : null;
 
             const isLive = event.status?.type?.state === 'in';
-            const statusDetail = isLive 
+            const statusDetail = isLive
               ? (event.status?.type?.shortDetail || `${event.status?.displayClock || ''} Q${event.status?.period || ''}`)
               : formatMatchTime(event.date, event.status?.type?.shortDetail);
 
-            let defSpread = sport === 'NFL' ? 3.5 : (sport === 'NBA' ? 4.5 : 0.5);
-            let defTotal = sport === 'NFL' ? 47.5 : (sport === 'NBA' ? 224.5 : 2.5);
-
-            const spreadVal = oddsObj?.spread ?? defSpread;
-            const ouVal = oddsObj?.overUnder ?? defTotal;
-
+            const defSpread = sport === 'NFL' ? 3.5 : (sport === 'NBA' ? 4.5 : 0.5);
+            const defTotal = sport === 'NFL' ? 47.5 : (sport === 'NBA' ? 224.5 : 2.5);
+            const spreadVal = odds?.spread ?? defSpread;
+            const ouVal = odds?.overUnder ?? defTotal;
             const awaySpreadLine = spreadVal > 0 ? `+${spreadVal}` : `${spreadVal}`;
             const homeSpreadLine = spreadVal > 0 ? `-${spreadVal}` : `+${Math.abs(spreadVal)}`;
-
-            const awayML = oddsObj?.awayTeamOdds?.moneyLine || oddsObj?.moneyline?.away?.close?.odds || (spreadVal > 0 ? "+135" : "-155");
-            const homeML = oddsObj?.homeTeamOdds?.moneyLine || oddsObj?.moneyline?.home?.close?.odds || (spreadVal > 0 ? "-155" : "+135");
+            const awayML = odds?.awayTeamOdds?.moneyLine || (spreadVal > 0 ? "+135" : "-155");
+            const homeML = odds?.homeTeamOdds?.moneyLine || (spreadVal > 0 ? "-155" : "+135");
 
             const eventDate = new Date(event.date);
             const dateKey = getDateKey(eventDate);
             const formattedDay = eventDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
             parsed.push({
-              id: event.id,
-              sport,
-              isLive,
-              date: event.date,
-              dateKey: dateKey,
-              formattedDay: formattedDay,
-              statusDetail,
+              id: event.id, sport, isLive, date: event.date, dateKey, formattedDay, statusDetail,
               awayTeam: {
                 name: away.team.displayName || away.team.name,
                 shortName: away.team.shortDisplayName || away.team.abbreviation,
@@ -959,34 +821,14 @@
                 logo: home.team.logo || "https://a.espncdn.com/i/teamlogos/default-team-logo-500.png"
               },
               markets: {
-                spread: {
-                  awayLine: awaySpreadLine,
-                  awayOdds: oddsObj?.pointSpread?.away?.close?.odds || -110,
-                  homeLine: homeSpreadLine,
-                  homeOdds: oddsObj?.pointSpread?.home?.close?.odds || -110
-                },
-                moneyline: {
-                  awayOdds: awayML,
-                  homeOdds: homeML
-                },
-                total: {
-                  overLine: `O ${ouVal}`,
-                  overOdds: oddsObj?.total?.over?.close?.odds || -110,
-                  underLine: `U ${ouVal}`,
-                  underOdds: oddsObj?.total?.under?.close?.odds || -110
-                }
+                spread: { awayLine: awaySpreadLine, awayOdds: odds?.pointSpread?.away?.close?.odds || -110, homeLine: homeSpreadLine, homeOdds: odds?.pointSpread?.home?.close?.odds || -110 },
+                moneyline: { awayOdds: awayML, homeOdds: homeML },
+                total: { overLine: `O ${ouVal}`, overOdds: odds?.total?.over?.close?.odds || -110, underLine: `U ${ouVal}`, underOdds: odds?.total?.under?.close?.odds || -110 }
               }
             });
           });
-        };
-
-        responses.forEach(res => {
-          if (res && res.data) {
-            processLeagueEvents(res.data, res.sport);
-          }
         });
 
-        // Sort chronologically: Live games first, then earliest start times
         parsed.sort((a, b) => {
           if (a.isLive && !b.isLive) return -1;
           if (!a.isLive && b.isLive) return 1;
@@ -999,61 +841,52 @@
         renderGames();
         updateTicker();
 
-        if (isManual) showToast("Schedule & Odds Synced", `${parsed.length} upcoming games loaded across the next 7 days.`);
+        if (isManual) showToast("Schedule Synced", `${parsed.length} upcoming games loaded across the next 7 days.`);
       } catch (err) {
-        console.error("Failed to fetch odds:", err);
+        console.error("Fetch error:", err);
       } finally {
-        if (refreshIcon) refreshIcon.classList.remove("animate-spin");
+        refreshIcons.forEach(i => i.classList.remove("animate-spin"));
       }
     }
 
-    // 7-DAY SCHEDULE TAB SELECTOR
+    // ==========================================
+    // 7-DAY DATE TAB SELECTOR
+    // ==========================================
     function renderDateTabs() {
       const container = document.getElementById("datePillsContainer");
       if (!container) return;
 
-      const days = [];
       const now = new Date();
-      
+      const days = [];
       for (let i = 0; i < 7; i++) {
-        const d = new Date();
-        d.setDate(now.getDate() + i);
+        const d = new Date(); d.setDate(now.getDate() + i);
         const key = getDateKey(d);
         const dayName = i === 0 ? "Today" : (i === 1 ? "Tomorrow" : d.toLocaleDateString(undefined, { weekday: 'short' }));
         const dateFormatted = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-        
-        // Count games matching current sport filter on this date
         const count = liveGames.filter(g => {
-          const matchSport = (currentFilter === "ALL") || (currentFilter === "LIVE" ? g.isLive : g.sport === currentFilter);
-          return matchSport && g.dateKey === key;
+          const ms = (currentFilter === "ALL") || (currentFilter === "LIVE" ? g.isLive : g.sport === currentFilter);
+          return ms && g.dateKey === key;
         }).length;
-
         days.push({ key, dayName, dateFormatted, count });
       }
 
-      const totalSportCount = liveGames.filter(g => {
-        return (currentFilter === "ALL") || (currentFilter === "LIVE" ? g.isLive : g.sport === currentFilter);
-      }).length;
+      const totalCount = liveGames.filter(g =>
+        (currentFilter === "ALL") || (currentFilter === "LIVE" ? g.isLive : g.sport === currentFilter)
+      ).length;
 
-      let html = `
-        <button onclick="setDateFilter('ALL')" 
-          class="px-3 py-1.5 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-bold shrink-0 ${selectedDateKey === 'ALL' ? 'bg-brand-green text-black shadow-md shadow-brand-green/20' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 hover:text-white'}">
-          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-          <span>All 7 Days</span>
-          <span class="text-[10px] px-1.5 py-0.2 rounded-full ${selectedDateKey === 'ALL' ? 'bg-black/25 text-black font-black' : 'bg-slate-800 text-slate-400 font-bold'}">${totalSportCount}</span>
-        </button>
-      `;
+      let html = `<button onclick="setDateFilter('ALL')" class="px-3 py-1.5 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-bold shrink-0 ${selectedDateKey === 'ALL' ? 'bg-brand-green text-black shadow-md' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 hover:text-white'}">
+        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+        <span>All 7 Days</span>
+        <span class="text-[10px] px-1.5 rounded-full ${selectedDateKey === 'ALL' ? 'bg-black/25 text-black font-black' : 'bg-slate-800 text-slate-400'}">${totalCount}</span>
+      </button>`;
 
       days.forEach(d => {
         const isActive = selectedDateKey === d.key;
-        html += `
-          <button onclick="setDateFilter('${d.key}')" 
-            class="px-3 py-1.5 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-bold shrink-0 ${isActive ? 'bg-brand-green text-black shadow-md shadow-brand-green/20' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 hover:text-white'}">
-            <span>${d.dayName}</span>
-            <span class="text-[10px] ${isActive ? 'text-black/80 font-medium' : 'text-slate-400 font-normal'}">${d.dateFormatted}</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-black/25 text-black font-black' : (d.count > 0 ? 'bg-brand-green/10 text-brand-green border border-brand-green/30 font-bold' : 'bg-slate-800/80 text-slate-500 font-medium')}">${d.count}</span>
-          </button>
-        `;
+        html += `<button onclick="setDateFilter('${d.key}')" class="px-3 py-1.5 rounded-xl whitespace-nowrap transition flex items-center gap-1.5 font-bold shrink-0 ${isActive ? 'bg-brand-green text-black shadow-md' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 hover:text-white'}">
+          <span>${d.dayName}</span>
+          <span class="text-[10px] ${isActive ? 'text-black/70' : 'text-slate-400'}">${d.dateFormatted}</span>
+          <span class="text-[10px] px-1.5 rounded-full ${isActive ? 'bg-black/25 text-black font-black' : (d.count > 0 ? 'bg-brand-green/10 text-brand-green border border-brand-green/30 font-bold' : 'bg-slate-800 text-slate-500')}">${d.count}</span>
+        </button>`;
       });
 
       container.innerHTML = html;
@@ -1072,28 +905,27 @@
         } else {
           const sample = liveGames.find(g => g.dateKey === key);
           if (sample) {
-            summaryEl.textContent = `${sample.formattedDay}`;
+            summaryEl.textContent = sample.formattedDay;
           } else {
-            const y = key.substring(0, 4);
-            const m = parseInt(key.substring(4, 6), 10) - 1;
-            const d = parseInt(key.substring(6, 8), 10);
-            const dateObj = new Date(y, m, d);
-            summaryEl.textContent = dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            const y = key.substring(0,4), m = parseInt(key.substring(4,6),10)-1, d = parseInt(key.substring(6,8),10);
+            summaryEl.textContent = new Date(y, m, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
           }
         }
       }
     }
 
+    // ==========================================
+    // LIVE TICKER
+    // ==========================================
     function updateTicker() {
       const ticker = document.getElementById("tickerItems");
       if (!ticker || liveGames.length === 0) return;
-
       ticker.innerHTML = liveGames.slice(0, 8).map(g => `
         <div class="flex items-center gap-2 cursor-pointer hover:text-white transition" onclick="setSportFilter('${g.sport}')">
           <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-1.5 py-0.2 rounded">${g.sport}</span>
-          <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.awayTeam.shortName} ${g.isLive ? g.awayTeam.score : ''}</span>
+          <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.awayTeam.shortName}${g.isLive ? ' ' + g.awayTeam.score : ''}</span>
           <span class="text-slate-500">@</span>
-          <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.homeTeam.shortName} ${g.isLive ? g.homeTeam.score : ''}</span>
+          <span class="${g.isLive ? 'text-brand-green font-bold' : ''}">${g.homeTeam.shortName}${g.isLive ? ' ' + g.homeTeam.score : ''}</span>
           <span class="text-[10px] ${g.isLive ? 'text-red-400 font-bold' : 'text-slate-400'}">(${g.statusDetail})</span>
         </div>
       `).join('');
@@ -1110,6 +942,9 @@
       renderGames();
     }
 
+    // ==========================================
+    // RENDER GAME CARDS
+    // ==========================================
     function renderGames() {
       const container = document.getElementById("gamesContainer");
       container.innerHTML = "";
@@ -1118,10 +953,10 @@
         const matchesSport = (currentFilter === "ALL") || (currentFilter === "LIVE" ? g.isLive : g.sport === currentFilter);
         const matchesDate = (selectedDateKey === "ALL") || (g.dateKey === selectedDateKey);
         const q = searchQuery.toLowerCase();
-        const matchesSearch = !searchQuery || 
-          g.homeTeam.name.toLowerCase().includes(q) || 
+        const matchesSearch = !searchQuery ||
+          g.homeTeam.name.toLowerCase().includes(q) ||
           g.awayTeam.name.toLowerCase().includes(q) ||
-          getPropsForGame(g).some(p => p.player.toLowerCase().includes(q));
+          getPropsForGame(g).some(p => p.player && p.player.toLowerCase().includes(q));
         return matchesSport && matchesDate && matchesSearch;
       });
 
@@ -1129,10 +964,9 @@
         container.innerHTML = `
           <div class="bg-brand-card border border-brand-border rounded-2xl p-10 text-center text-slate-400">
             <i data-lucide="calendar-clock" class="w-8 h-8 mx-auto text-slate-600 mb-2"></i>
-            <p class="font-bold text-sm text-slate-300">No scheduled games found on this day for the selected sport.</p>
-            <p class="text-xs text-slate-500 mt-1">Try clicking another day tab or select <span class="text-brand-green font-bold cursor-pointer underline" onclick="setDateFilter('ALL')">All 7 Days</span> to view the full upcoming schedule.</p>
-          </div>
-        `;
+            <p class="font-bold text-sm text-slate-300">No games scheduled on this day for the selected sport.</p>
+            <p class="text-xs text-slate-500 mt-1">Try a different day tab or select <span class="text-brand-green font-bold cursor-pointer underline" onclick="setDateFilter('ALL')">All 7 Days</span>.</p>
+          </div>`;
         lucide.createIcons();
         return;
       }
@@ -1152,79 +986,64 @@
           const categoryTabs = `
             <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-[11px] font-bold">
               ${availableCats.map(cat => `
-                <button onclick="setPropCategory('${game.id}', '${cat}')" 
-                  class="px-2.5 py-1 rounded-lg transition whitespace-nowrap ${selectedCat === cat ? 'bg-brand-green text-black font-extrabold' : 'bg-brand-surface hover:bg-slate-700 text-slate-300'}">
+                <button onclick="setPropCategory('${game.id}', '${cat}')"
+                  class="px-2.5 py-1 rounded-lg border transition whitespace-nowrap ${selectedCat === cat ? 'bg-brand-green text-black font-extrabold border-brand-green' : 'bg-brand-surface hover:bg-slate-700 text-slate-300 border-brand-border'}">
                   ${cat}
                 </button>
               `).join('')}
             </div>
           `;
 
-          const propsList = visibleProps.length > 0 ? visibleProps.map(p => {
-            const overId = `${game.id}_prop_${p.player}_${p.cat}_over`;
-            const underId = `${game.id}_prop_${p.player}_${p.cat}_under`;
-            const isOverSelected = betSlip.some(b => b.selectionId === overId);
-            const isUnderSelected = betSlip.some(b => b.selectionId === underId);
-
-            if (p.isTD) {
+          const propsCards = visibleProps.map(prop => {
+            if (prop.isSingle) {
               return `
-                <div class="flex items-center justify-between bg-brand-surface/80 border border-brand-border/70 rounded-xl p-2.5 hover:border-slate-600 transition">
-                  <div>
-                    <span class="text-xs font-bold text-white block">${p.player}</span>
-                    <span class="text-[10px] text-slate-400">${p.cat}</span>
+                <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-2.5 flex items-center justify-between gap-2 shadow-sm">
+                  <div class="min-w-0">
+                    <div class="font-extrabold text-white text-xs truncate">${prop.player}</div>
+                    <div class="text-[10px] text-slate-400">${prop.team} • ${prop.cat}</div>
                   </div>
-                  <button onclick="addPropToSlip('${game.id}', '${p.player}', '${p.cat}', 'Yes', '${p.line}', ${p.overOdds})" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1.5 ${isOverSelected ? 'bg-brand-green text-black font-black' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-brand-green'}">
-                    <span>Yes</span>
-                    <span>${formatOdds(p.overOdds)}</span>
+                  <button onclick="toggleBetSelection('${game.id}', 'Prop', '${prop.player} - ${prop.cat}', '${prop.over}', '${game.awayTeam.shortName} @ ${game.homeTeam.shortName}')"
+                    class="odds-btn bg-brand-surface hover:border-brand-green border border-brand-border px-3 py-1.5 rounded-lg text-xs font-black text-brand-green whitespace-nowrap transition"
+                    data-bet-id="${game.id}-Prop-${prop.player}">
+                    ${formatOdds(prop.over)}
                   </button>
                 </div>
               `;
+            } else {
+              return `
+                <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-2.5 flex flex-col justify-between gap-2 shadow-sm">
+                  <div class="flex items-center justify-between">
+                    <div class="font-extrabold text-white text-xs truncate">${prop.player}</div>
+                    <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">${prop.cat}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="toggleBetSelection('${game.id}', 'Prop', '${prop.player} Over ${prop.line} ${prop.cat}', '${prop.over}', '${game.awayTeam.shortName} @ ${game.homeTeam.shortName}')"
+                      class="odds-btn flex-1 flex items-center justify-between bg-brand-surface hover:border-brand-green border border-brand-border px-2 py-1.5 rounded-lg text-[11px] font-mono font-black text-white transition">
+                      <span>O ${prop.line}</span>
+                      <span class="text-brand-green">${formatOdds(prop.over)}</span>
+                    </button>
+                    <button onclick="toggleBetSelection('${game.id}', 'Prop', '${prop.player} Under ${prop.line} ${prop.cat}', '${prop.under}', '${game.awayTeam.shortName} @ ${game.homeTeam.shortName}')"
+                      class="odds-btn flex-1 flex items-center justify-between bg-brand-surface hover:border-brand-green border border-brand-border px-2 py-1.5 rounded-lg text-[11px] font-mono font-black text-white transition">
+                      <span>U ${prop.line}</span>
+                      <span class="text-brand-green">${formatOdds(prop.under)}</span>
+                    </button>
+                  </div>
+                </div>
+              `;
             }
-
-            return `
-              <div class="flex items-center justify-between bg-brand-surface/80 border border-brand-border/70 rounded-xl p-2.5 hover:border-slate-600 transition">
-                <div>
-                  <span class="text-xs font-bold text-white block">${p.player}</span>
-                  <span class="text-[10px] text-slate-400">${p.cat} • <strong class="text-slate-200">${p.line}</strong></span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="addPropToSlip('${game.id}', '${p.player}', '${p.cat}', 'Over', '${p.line}', ${p.overOdds})" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1.5 ${isOverSelected ? 'bg-brand-green text-black font-black' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-white'}">
-                    <span>O ${p.line}</span>
-                    <span class="text-brand-green ${isOverSelected ? 'text-black' : ''}">${formatOdds(p.overOdds)}</span>
-                  </button>
-                  <button onclick="addPropToSlip('${game.id}', '${p.player}', '${p.cat}', 'Under', '${p.line}', ${p.underOdds})" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1.5 ${isUnderSelected ? 'bg-brand-green text-black font-black' : 'bg-brand-card hover:bg-brand-cardHover border border-brand-border text-white'}">
-                    <span>U ${p.line}</span>
-                    <span class="text-brand-green ${isUnderSelected ? 'text-black' : ''}">${formatOdds(p.underOdds)}</span>
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('') : `
-            <div class="text-xs text-slate-500 py-3 text-center">No player props in this category for this game.</div>
-          `;
+          }).join('');
 
           propsHtml = `
             <div class="mt-3 pt-3 border-t border-brand-border/80 space-y-2.5">
               ${categoryTabs}
               <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                ${propsList}
+                ${propsCards || '<div class="text-xs text-slate-500 py-3 text-center col-span-2">No props in this category.</div>'}
               </div>
             </div>
           `;
         }
 
-        const isAwayML = betSlip.some(b => b.selectionId === `${game.id}_ml_away`);
-        const isHomeML = betSlip.some(b => b.selectionId === `${game.id}_ml_home`);
-        const isAwaySpread = betSlip.some(b => b.selectionId === `${game.id}_spread_away`);
-        const isHomeSpread = betSlip.some(b => b.selectionId === `${game.id}_spread_home`);
-        const isOver = betSlip.some(b => b.selectionId === `${game.id}_total_over`);
-        const isUnder = betSlip.some(b => b.selectionId === `${game.id}_total_under`);
-
         card.innerHTML = `
-          <!-- Header: Sport, Status, Time & SGP Trigger -->
           <div class="flex items-center justify-between mb-3 text-xs">
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-800 text-slate-300">${game.sport}</span>
@@ -1233,9 +1052,7 @@
                 ${game.statusDetail}
               </span>
             </div>
-
-            <!-- Expand / Collapse Props Button -->
-            <button onclick="togglePropsDrawer('${game.id}')" 
+            <button onclick="togglePropsDrawer('${game.id}')"
               class="flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-1 rounded-lg border transition ${isExpanded ? 'bg-brand-green/20 text-brand-green border-brand-green/40' : 'bg-brand-surface hover:bg-slate-700 text-slate-300 border-brand-border'}">
               <i data-lucide="zap" class="w-3.5 h-3.5 text-brand-green"></i>
               <span>${isExpanded ? 'Hide Props' : '⚡ Player Props & SGP'}</span>
@@ -1243,12 +1060,8 @@
             </button>
           </div>
 
-          <!-- Main Teams & 3-Column Odds Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
-            
-            <!-- Teams & Scores (5 Cols) -->
             <div class="sm:col-span-5 space-y-2">
-              <!-- Away Team -->
               <div class="flex items-center justify-between pr-2">
                 <div class="flex items-center gap-2.5">
                   <img src="${game.awayTeam.logo}" alt="" class="w-6 h-6 object-contain" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo-500.png'" />
@@ -1256,8 +1069,6 @@
                 </div>
                 ${game.isLive ? `<span class="font-mono font-black text-sm text-brand-green">${game.awayTeam.score}</span>` : ''}
               </div>
-
-              <!-- Home Team -->
               <div class="flex items-center justify-between pr-2">
                 <div class="flex items-center gap-2.5">
                   <img src="${game.homeTeam.logo}" alt="" class="w-6 h-6 object-contain" onerror="this.src='https://a.espncdn.com/i/teamlogos/default-team-logo-500.png'" />
@@ -1267,53 +1078,39 @@
               </div>
             </div>
 
-            <!-- Betting Markets (7 Cols: Spread, ML, Total) -->
             <div class="sm:col-span-7 grid grid-cols-3 gap-2">
-              
-              <!-- SPREAD -->
               <div class="space-y-1.5">
-                <button onclick="addToSlip('${game.id}', '${game.awayTeam.shortName} ${game.markets.spread.awayLine}', '${game.sport} Spread', ${game.markets.spread.awayOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_spread_away')"
-                  class="w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isAwaySpread ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-white'}">
-                  <span>${game.markets.spread.awayLine}</span>
-                  <span class="text-brand-green ${isAwaySpread ? 'text-black' : ''}">${formatOdds(game.markets.spread.awayOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'Spread', '${game.awayTeam.shortName} ${game.markets.spread.awayLine}', '${game.markets.spread.awayOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-white" data-bet-id="${game.id}-Spread-away">
+                  <span>${game.markets.spread.awayLine}</span><span class="text-brand-green">${formatOdds(game.markets.spread.awayOdds)}</span>
                 </button>
-                <button onclick="addToSlip('${game.id}', '${game.homeTeam.shortName} ${game.markets.spread.homeLine}', '${game.sport} Spread', ${game.markets.spread.homeOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_spread_home')"
-                  class="w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isHomeSpread ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-white'}">
-                  <span>${game.markets.spread.homeLine}</span>
-                  <span class="text-brand-green ${isHomeSpread ? 'text-black' : ''}">${formatOdds(game.markets.spread.homeOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'Spread', '${game.homeTeam.shortName} ${game.markets.spread.homeLine}', '${game.markets.spread.homeOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-white" data-bet-id="${game.id}-Spread-home">
+                  <span>${game.markets.spread.homeLine}</span><span class="text-brand-green">${formatOdds(game.markets.spread.homeOdds)}</span>
                 </button>
               </div>
-
-              <!-- MONEYLINE -->
               <div class="space-y-1.5">
-                <button onclick="addToSlip('${game.id}', '${game.awayTeam.name}', '${game.sport} Moneyline', ${game.markets.moneyline.awayOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_ml_away')"
-                  class="w-full flex items-center justify-center px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isAwayML ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-brand-green'}">
-                  <span>${formatOdds(game.markets.moneyline.awayOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'ML', '${game.awayTeam.name} ML', '${game.markets.moneyline.awayOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-center px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-brand-green" data-bet-id="${game.id}-ML-away">
+                  ${formatOdds(game.markets.moneyline.awayOdds)}
                 </button>
-                <button onclick="addToSlip('${game.id}', '${game.homeTeam.name}', '${game.sport} Moneyline', ${game.markets.moneyline.homeOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_ml_home')"
-                  class="w-full flex items-center justify-center px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isHomeML ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-brand-green'}">
-                  <span>${formatOdds(game.markets.moneyline.homeOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'ML', '${game.homeTeam.name} ML', '${game.markets.moneyline.homeOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-center px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-brand-green" data-bet-id="${game.id}-ML-home">
+                  ${formatOdds(game.markets.moneyline.homeOdds)}
                 </button>
               </div>
-
-              <!-- TOTAL (O/U) -->
               <div class="space-y-1.5">
-                <button onclick="addToSlip('${game.id}', '${game.markets.total.overLine}', '${game.sport} Total', ${game.markets.total.overOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_total_over')"
-                  class="w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isOver ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-white'}">
-                  <span>${game.markets.total.overLine}</span>
-                  <span class="text-brand-green ${isOver ? 'text-black' : ''}">${formatOdds(game.markets.total.overOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'Total', '${game.markets.total.overLine}', '${game.markets.total.overOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-white" data-bet-id="${game.id}-Total-over">
+                  <span>${game.markets.total.overLine}</span><span class="text-brand-green">${formatOdds(game.markets.total.overOdds)}</span>
                 </button>
-                <button onclick="addToSlip('${game.id}', '${game.markets.total.underLine}', '${game.sport} Total', ${game.markets.total.underOdds}, '${game.awayTeam.name} @ ${game.homeTeam.name}', '${game.id}_total_under')"
-                  class="w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border ${isUnder ? 'bg-brand-green text-black font-black border-brand-green' : 'bg-brand-surface hover:bg-slate-700/80 border-brand-border text-white'}">
-                  <span>${game.markets.total.underLine}</span>
-                  <span class="text-brand-green ${isUnder ? 'text-black' : ''}">${formatOdds(game.markets.total.underOdds)}</span>
+                <button onclick="toggleBetSelection('${game.id}', 'Total', '${game.markets.total.underLine}', '${game.markets.total.underOdds}', '${game.awayTeam.name} @ ${game.homeTeam.name}')"
+                  class="odds-btn w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-mono font-bold transition border bg-brand-surface hover:bg-slate-700 border-brand-border text-white" data-bet-id="${game.id}-Total-under">
+                  <span>${game.markets.total.underLine}</span><span class="text-brand-green">${formatOdds(game.markets.total.underOdds)}</span>
                 </button>
               </div>
-
             </div>
           </div>
-
-          <!-- Expandable Props Drawer -->
           ${propsHtml}
         `;
 
@@ -1321,41 +1118,35 @@
       });
 
       lucide.createIcons();
+      // Re-highlight any active bet buttons
+      betSlip.forEach(b => {
+        const el = document.querySelector(`[data-bet-id="${b.key}"]`);
+        if (el) el.classList.add("border-brand-green", "bg-brand-green/10", "text-brand-green");
+      });
     }
 
     // ==========================================
-    // BET SLIP SELECTION & MATH ENGINE
+    // BET SLIP ENGINE
     // ==========================================
-    function addToSlip(gameId, pickName, marketName, americanOdds, matchDescription, selectionId) {
-      const idx = betSlip.findIndex(b => b.selectionId === selectionId);
-      if (idx !== -1) {
-        betSlip.splice(idx, 1);
+    function toggleBetSelection(gameId, market, pick, odds, matchup) {
+      const betKey = `${gameId}-${market}-${pick}`;
+      const existingIdx = betSlip.findIndex(b => b.key === betKey);
+      if (existingIdx > -1) {
+        betSlip.splice(existingIdx, 1);
       } else {
-        betSlip.push({
-          gameId,
-          pickName,
-          marketName,
-          odds: parseInt(americanOdds, 10),
-          matchDescription,
-          selectionId
-        });
-        showToast("Pick Added", `${pickName} (${formatOdds(americanOdds)}) added to slip.`);
+        if (market !== 'Prop') {
+          const conflictIdx = betSlip.findIndex(b => b.gameId === gameId && b.market === market);
+          if (conflictIdx > -1) betSlip.splice(conflictIdx, 1);
+        }
+        betSlip.push({ key: betKey, gameId, market, pick, odds: parseInt(odds, 10), matchup });
+        showToast("Pick Added", `${pick} (${formatOdds(odds)}) added to slip.`);
       }
       updateBetSlipUI();
       renderGames();
     }
 
-    function addPropToSlip(gameId, player, category, side, line, americanOdds) {
-      const selId = side === "Yes" ? `${gameId}_prop_${player}_${category}_over` : `${gameId}_prop_${player}_${category}_${side.toLowerCase()}`;
-      const pickTitle = side === "Yes" ? `${player} Anytime TD/Goal` : `${player} ${side} ${line} ${category}`;
-      const game = liveGames.find(g => g.id === gameId);
-      const matchDesc = game ? `${game.awayTeam.shortName} @ ${game.homeTeam.shortName}` : "Player Prop";
-
-      addToSlip(gameId, pickTitle, `Prop: ${category}`, americanOdds, matchDesc, selId);
-    }
-
-    function removeSlipItem(selectionId) {
-      betSlip = betSlip.filter(b => b.selectionId !== selectionId);
+    function removeSlipItem(betKey) {
+      betSlip = betSlip.filter(b => b.key !== betKey);
       updateBetSlipUI();
       renderGames();
     }
@@ -1363,7 +1154,7 @@
     function updateBetSlipUI() {
       const count = betSlip.length;
       document.getElementById("slipCountBadge").textContent = count;
-      document.getElementById("mobileSlipCount").textContent = count;
+      document.getElementById("slipCountBadgeMobile").textContent = count;
 
       const container = document.getElementById("slipItemsList");
       const btnPlace = document.getElementById("btnPlaceBet");
@@ -1372,14 +1163,12 @@
         container.innerHTML = `
           <div class="py-10 text-center text-slate-500">
             <i data-lucide="receipt" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
-            <p class="text-xs font-bold text-slate-400">Your Bet Slip is empty</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Click any spread, moneyline, or player prop to build your bet.</p>
-          </div>
-        `;
-        // STRICT EMPTY SLIP LOCK
+            <p class="text-xs font-bold text-slate-400">Bet Slip is empty</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Click any odds button or player prop to build your bet.</p>
+          </div>`;
         btnPlace.disabled = true;
+        btnPlace.className = "w-full py-3 rounded-xl font-black text-xs tracking-wider uppercase transition shadow-lg opacity-40 pointer-events-none bg-brand-green text-black shadow-brand-green/20";
         btnPlace.textContent = "SELECT PICKS TO BET";
-        btnPlace.className = "w-full py-3 rounded-xl font-black text-xs tracking-wider uppercase transition shadow-lg opacity-40 pointer-events-none bg-brand-green text-black";
         document.getElementById("slipCombinedOdds").textContent = "+0";
         document.getElementById("slipTotalPayout").textContent = "$0.00";
         document.getElementById("slipPotentialProfit").textContent = "+$0.00";
@@ -1387,22 +1176,20 @@
         return;
       }
 
-      // UNLOCK BUTTON IF PICKS EXIST
       btnPlace.disabled = false;
-      btnPlace.textContent = slipMode === "PARLAY" && count > 1 ? `PLACE ${count}-LEG PARLAY` : "PLACE BET";
       btnPlace.className = "w-full py-3 rounded-xl font-black text-xs tracking-wider uppercase transition shadow-lg bg-brand-green hover:bg-emerald-400 text-black shadow-brand-green/20 cursor-pointer";
+      btnPlace.textContent = slipMode === "PARLAY" && count > 1 ? `PLACE ${count}-LEG PARLAY` : "PLACE BET";
 
       container.innerHTML = betSlip.map(item => `
-        <div class="bg-brand-card border border-brand-border rounded-xl p-2.5 relative group">
-          <button onclick="removeSlipItem('${item.selectionId}')" class="absolute top-2 right-2 text-slate-500 hover:text-red-400 p-0.5 transition">
+        <div class="bg-brand-card border border-brand-border rounded-xl p-2.5 relative">
+          <button onclick="removeSlipItem('${item.key}')" class="absolute top-2 right-2 text-slate-500 hover:text-red-400 p-0.5 transition">
             <i data-lucide="x" class="w-3.5 h-3.5"></i>
           </button>
-          <span class="text-[10px] font-bold text-brand-green uppercase">${item.marketName}</span>
-          <h4 class="text-xs font-black text-white pr-4 leading-tight">${item.pickName}</h4>
-          <p class="text-[10px] text-slate-400 mt-0.5">${item.matchDescription}</p>
+          <span class="text-[10px] font-bold text-brand-green uppercase">${item.market}</span>
+          <h4 class="text-xs font-black text-white pr-4 leading-tight">${item.pick}</h4>
+          <p class="text-[10px] text-slate-400 mt-0.5">${item.matchup}</p>
           <div class="mt-1 flex items-center justify-between text-xs font-mono font-black text-brand-green">
-            <span>Odds:</span>
-            <span>${formatOdds(item.odds)}</span>
+            <span>Odds:</span><span>${formatOdds(item.odds)}</span>
           </div>
         </div>
       `).join('');
@@ -1412,83 +1199,44 @@
     }
 
     function calculateSlipPayout() {
-      const wagerInput = document.getElementById("slipWagerInput");
-      const wager = parseFloat(wagerInput.value) || 0;
+      const wager = parseFloat(document.getElementById("slipWagerInput").value) || 0;
       document.getElementById("slipAvailBalance").textContent = `$${userBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-
       if (betSlip.length === 0 || wager <= 0) {
         document.getElementById("slipCombinedOdds").textContent = "+0";
         document.getElementById("slipTotalPayout").textContent = "$0.00";
         document.getElementById("slipPotentialProfit").textContent = "+$0.00";
         return;
       }
-
       let combinedDecimal = 1.0;
-      betSlip.forEach(item => {
-        combinedDecimal *= toDecimalOdds(item.odds);
-      });
-
-      // Calculate American odds equivalent for display
-      let americanCombined = 0;
-      if (combinedDecimal >= 2.0) {
-        americanCombined = Math.round((combinedDecimal - 1) * 100);
-      } else {
-        americanCombined = Math.round(-100 / (combinedDecimal - 1));
-      }
-
+      betSlip.forEach(item => { combinedDecimal *= toDecimalOdds(item.odds); });
+      const americanCombined = combinedDecimal >= 2.0 ? Math.round((combinedDecimal-1)*100) : Math.round(-100/(combinedDecimal-1));
       document.getElementById("slipCombinedOdds").textContent = formatOdds(americanCombined);
-
       const totalReturn = wager * combinedDecimal;
       const profit = totalReturn - wager;
-
-      document.getElementById("slipTotalPayout").textContent = `$${totalReturn.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-      document.getElementById("slipPotentialProfit").textContent = `+$${profit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById("slipTotalPayout").textContent = `$${totalReturn.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+      document.getElementById("slipPotentialProfit").textContent = `+$${profit.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
     }
 
     function setQuickWager(amt) {
-      if (amt === 'MAX') {
-        document.getElementById("slipWagerInput").value = Math.floor(userBalance);
-      } else {
-        document.getElementById("slipWagerInput").value = amt;
-      }
+      document.getElementById("slipWagerInput").value = amt === 'MAX' ? Math.floor(userBalance) : amt;
       calculateSlipPayout();
     }
 
     function setSlipMode(mode) {
       slipMode = mode;
-      if (mode === "PARLAY") {
-        document.getElementById("slipModeParlay").className = "flex-1 py-1.5 rounded-lg transition active-chip";
-        document.getElementById("slipModeSingles").className = "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
-      } else {
-        document.getElementById("slipModeSingles").className = "flex-1 py-1.5 rounded-lg transition active-chip";
-        document.getElementById("slipModeParlay").className = "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
-      }
+      document.getElementById("slipModeParlay").className = mode === "PARLAY" ? "flex-1 py-1.5 rounded-lg transition bg-brand-card text-brand-green shadow-sm" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
+      document.getElementById("slipModeSingles").className = mode === "SINGLES" ? "flex-1 py-1.5 rounded-lg transition bg-brand-card text-brand-green shadow-sm" : "flex-1 py-1.5 rounded-lg text-slate-400 hover:text-white transition";
       updateBetSlipUI();
     }
 
-    // STRICT PLACE BET WITH EMPTY CHECK GUARD
     function placeBetSlip() {
-      // Guard: absolutely cannot bet on nothing
-      if (betSlip.length === 0) {
-        showToast("Error", "Your Bet Slip is empty! Add picks before betting.");
-        return;
-      }
-
-      const wagerInput = document.getElementById("slipWagerInput");
-      const wager = parseFloat(wagerInput.value) || 0;
-
-      if (wager <= 0) {
-        showToast("Invalid Amount", "Please enter a valid bet amount.");
-        return;
-      }
-
-      if (wager > userBalance) {
-        showToast("Insufficient Balance", "You do not have enough funds for this wager.");
-        return;
-      }
+      if (betSlip.length === 0) { showToast("Empty Slip", "Add picks before placing a bet."); return; }
+      const wager = parseFloat(document.getElementById("slipWagerInput").value) || 0;
+      if (wager <= 0) { showToast("Invalid Wager", "Enter a valid bet amount."); return; }
+      if (wager > userBalance) { showToast("Insufficient Balance", "Not enough funds for this wager."); return; }
 
       let combinedDecimal = 1.0;
-      betSlip.forEach(item => combinedDecimal *= toDecimalOdds(item.odds));
+      betSlip.forEach(item => { combinedDecimal *= toDecimalOdds(item.odds); });
       const totalReturn = wager * combinedDecimal;
       const profit = totalReturn - wager;
 
@@ -1498,49 +1246,36 @@
       const newBet = {
         id: "BET-" + Math.floor(100000 + Math.random() * 900000),
         placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        wager: wager,
-        potentialReturn: totalReturn,
-        profit: profit,
+        wager, potentialReturn: totalReturn, profit,
         legs: [...betSlip],
         type: betSlip.length > 1 ? `${betSlip.length}-Leg Parlay` : "Single Bet",
-        status: "OPEN" // OPEN, WON, LOST
+        status: "OPEN"
       };
-
       myPlacedBets.unshift(newBet);
       localStorage.setItem("apex_placed_bets", JSON.stringify(myPlacedBets));
 
-      // Reset bet slip
       betSlip = [];
       updateBetSlipUI();
       renderGames();
       renderMyBets();
       switchAsideTab('MYBETS');
-
       showToast("Bet Submitted!", `$${wager.toFixed(2)} placed on ${newBet.type}.`);
     }
 
     // ==========================================
-    // MY BETS TAB & RESULT SIMULATION
+    // MY BETS
     // ==========================================
     function switchAsideTab(tab) {
       activeAsideTab = tab;
-      const slipBtn = document.getElementById("asideTabSlip");
-      const myBetsBtn = document.getElementById("asideTabMyBets");
-      const slipContent = document.getElementById("asideContentSlip");
-      const myBetsContent = document.getElementById("asideContentMyBets");
-
-      if (tab === 'SLIP') {
-        slipBtn.className = "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-brand-green text-brand-green";
-        myBetsBtn.className = "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white";
-        slipContent.classList.remove("hidden");
-        myBetsContent.classList.add("hidden");
-      } else {
-        myBetsBtn.className = "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-brand-green text-brand-green";
-        slipBtn.className = "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white";
-        myBetsContent.classList.remove("hidden");
-        slipContent.classList.add("hidden");
-        renderMyBets();
-      }
+      document.getElementById("asideTabSlip").className = tab === 'SLIP'
+        ? "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-brand-green text-brand-green"
+        : "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white";
+      document.getElementById("asideTabMyBets").className = tab === 'MYBETS'
+        ? "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-brand-green text-brand-green"
+        : "flex-1 py-3 text-xs font-extrabold flex items-center justify-center gap-1.5 border-b-2 border-transparent text-slate-400 hover:text-white";
+      document.getElementById("asideContentSlip").classList.toggle("hidden", tab !== 'SLIP');
+      document.getElementById("asideContentMyBets").classList.toggle("hidden", tab !== 'MYBETS');
+      if (tab === 'MYBETS') renderMyBets();
     }
 
     function renderMyBets() {
@@ -1548,100 +1283,58 @@
       document.getElementById("placedCountBadge").textContent = myPlacedBets.length;
 
       if (myPlacedBets.length === 0) {
-        container.innerHTML = `
-          <div class="py-12 text-center text-slate-500">
-            <i data-lucide="history" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
-            <p class="text-xs font-bold text-slate-400">No placed bets yet</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Your submitted wagers and results appear here.</p>
-          </div>
-        `;
+        container.innerHTML = `<div class="py-12 text-center text-slate-500"><i data-lucide="history" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i><p class="text-xs font-bold text-slate-400">No placed bets yet</p></div>`;
         lucide.createIcons();
         return;
       }
 
       container.innerHTML = myPlacedBets.map(bet => {
-        let statusBadge = "";
-        if (bet.status === "OPEN") {
-          statusBadge = `<span class="text-[10px] bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 px-2 py-0.5 rounded-full font-black">IN-PLAY / OPEN</span>`;
-        } else if (bet.status === "WON") {
-          statusBadge = `<span class="text-[10px] bg-brand-green/20 text-brand-green border border-brand-green/40 px-2 py-0.5 rounded-full font-black">WON (+$${bet.profit.toFixed(2)})</span>`;
-        } else {
-          statusBadge = `<span class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-black">LOST (-$${bet.wager.toFixed(2)})</span>`;
-        }
-
+        let badge = "";
+        if (bet.status === "OPEN") badge = `<span class="text-[10px] bg-yellow-400/10 text-yellow-400 border border-yellow-400/30 px-2 py-0.5 rounded-full font-black">OPEN</span>`;
+        else if (bet.status === "WON") badge = `<span class="text-[10px] bg-brand-green/20 text-brand-green border border-brand-green/40 px-2 py-0.5 rounded-full font-black">WON +$${bet.profit.toFixed(2)}</span>`;
+        else badge = `<span class="text-[10px] bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-black">LOST -$${bet.wager.toFixed(2)}</span>`;
         return `
-          <div class="bg-brand-card border border-brand-border rounded-xl p-3 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-black text-white">${bet.type}</span>
-              ${statusBadge}
-            </div>
-
-            <!-- Legs list -->
+          <div class="bg-brand-card border border-brand-border rounded-xl p-3 space-y-2 mb-2">
+            <div class="flex items-center justify-between"><span class="text-xs font-black text-white">${bet.type}</span>${badge}</div>
             <div class="space-y-1 border-y border-brand-border/60 py-2">
-              ${bet.legs.map(leg => `
-                <div class="text-[11px]">
-                  <span class="font-bold text-slate-200">${leg.pickName}</span>
-                  <span class="text-brand-green font-mono ml-1">${formatOdds(leg.odds)}</span>
-                  <p class="text-[9px] text-slate-500">${leg.matchDescription}</p>
-                </div>
-              `).join('')}
+              ${bet.legs.map(leg => `<div class="text-[11px]"><span class="font-bold text-slate-200">${leg.pick}</span><span class="text-brand-green font-mono ml-1">${formatOdds(leg.odds)}</span><p class="text-[9px] text-slate-500">${leg.matchup}</p></div>`).join('')}
             </div>
-
-            <!-- Stake & Payout details -->
             <div class="flex items-center justify-between text-xs font-mono">
-              <div>
-                <span class="text-slate-400 text-[10px] block">Wager:</span>
-                <span class="text-white font-bold">$${bet.wager.toFixed(2)}</span>
-              </div>
-              <div class="text-right">
-                <span class="text-slate-400 text-[10px] block">Potential Return:</span>
-                <span class="text-brand-green font-bold">$${bet.potentialReturn.toFixed(2)}</span>
-              </div>
+              <div><span class="text-slate-400 text-[10px] block">Wager:</span><span class="text-white font-bold">$${bet.wager.toFixed(2)}</span></div>
+              <div class="text-right"><span class="text-slate-400 text-[10px] block">Potential:</span><span class="text-brand-green font-bold">$${bet.potentialReturn.toFixed(2)}</span></div>
             </div>
-
-            <!-- Simulation Grading Buttons (Only for OPEN bets) -->
             ${bet.status === "OPEN" ? `
-              <div class="pt-1 flex items-center gap-1.5">
-                <button onclick="gradeSportsBet('${bet.id}', 'WON')" class="flex-1 bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/40 font-extrabold text-[10px] py-1 rounded-lg transition">
-                  ✓ Simulate Win
-                </button>
-                <button onclick="gradeSportsBet('${bet.id}', 'LOST')" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-extrabold text-[10px] py-1 rounded-lg transition">
-                  ✗ Simulate Loss
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        `;
+              <div class="flex items-center gap-1.5">
+                <button onclick="gradeSportsBet('${bet.id}', 'WON')" class="flex-1 bg-brand-green/20 hover:bg-brand-green/30 text-brand-green border border-brand-green/40 font-extrabold text-[10px] py-1 rounded-lg transition">✓ Win</button>
+                <button onclick="gradeSportsBet('${bet.id}', 'LOST')" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-extrabold text-[10px] py-1 rounded-lg transition">✗ Loss</button>
+              </div>` : ''}
+          </div>`;
       }).join('');
-
       lucide.createIcons();
     }
 
     function gradeSportsBet(betId, outcome) {
       const bet = myPlacedBets.find(b => b.id === betId);
       if (!bet || bet.status !== "OPEN") return;
-
       bet.status = outcome;
-
       if (outcome === "WON") {
         userBalance += bet.potentialReturn;
         sportsStats.wins += 1;
         sportsStats.netProfit += bet.profit;
         saveBalance();
-        showToast("Bet Won!", `Congratulations! $${bet.potentialReturn.toFixed(2)} credited to your wallet.`);
+        showToast("Bet Won!", `$${bet.potentialReturn.toFixed(2)} credited to your wallet!`);
       } else {
         sportsStats.losses += 1;
         sportsStats.netProfit -= bet.wager;
-        showToast("Bet Graded", `Wager marked as loss.`);
+        showToast("Bet Graded", "Marked as loss.");
       }
-
       localStorage.setItem("apex_placed_bets", JSON.stringify(myPlacedBets));
       updateStatsDisplay();
       renderMyBets();
     }
 
     function clearBetHistory() {
-      if (confirm("Clear all settled and active bets from your history?")) {
+      if (confirm("Clear all bet history?")) {
         myPlacedBets = [];
         localStorage.removeItem("apex_placed_bets");
         renderMyBets();
@@ -1649,531 +1342,263 @@
     }
 
     // ==========================================
-    // CASINO ENGINE (BLACKJACK & ROULETTE)
+    // CASINO — BLACKJACK
     // ==========================================
-    let activeCasinoGame = "BLACKJACK";
-    
-    // --- BLACKJACK STATE ---
-    let bjWager = 50;
-    let bjDeck = [];
-    let bjPlayerHand = [];
-    let bjDealerHand = [];
-    let bjGameInProgress = false;
-
-    // --- ROULETTE STATE ---
-    let rWager = 25;
-    let rSelectedBetType = "RED";
-    let rSelectedBetName = "Red (1:1)";
-    let rSelectedMultiplier = 1;
-    let rIsSpinning = false;
-
-    // --- SLOTS STATE ---
-    let slotWager = 20;
-    let slotIsSpinning = false;
-    const SLOT_SYMBOLS = ["7️⃣", "💎", "🔔", "🍇", "🍒"];
-
     function switchMainView(view) {
-      const sportsSec = document.getElementById("sportsMainSection");
-      const casinoSec = document.getElementById("casinoMainSection");
-      const tabSports = document.getElementById("viewTabSports");
-      const tabCasino = document.getElementById("viewTabCasino");
-
-      if (view === 'SPORTS') {
-        sportsSec.classList.remove("hidden");
-        casinoSec.classList.add("hidden");
-        tabSports.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition active-chip";
-        tabCasino.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition text-slate-400 hover:text-white";
-      } else {
-        sportsSec.classList.add("hidden");
-        casinoSec.classList.remove("hidden");
-        tabCasino.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition active-chip";
-        tabSports.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-black transition text-slate-400 hover:text-white";
-      }
+      const isS = view === 'SPORTS';
+      document.getElementById("sportsMainSection").classList.toggle("hidden", !isS);
+      document.getElementById("casinoMainSection").classList.toggle("hidden", isS);
+      document.getElementById("hubSportsBtn").className = isS ? "px-3.5 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-brand-card text-brand-green shadow-sm" : "px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5";
+      document.getElementById("hubCasinoBtn").className = !isS ? "px-3.5 py-1.5 rounded-lg text-xs font-black transition flex items-center gap-1.5 bg-brand-card text-brand-green shadow-sm" : "px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5";
     }
 
     function switchCasinoGame(game) {
       activeCasinoGame = game;
-      document.getElementById("casinoGameBlackjack").classList.toggle("hidden", game !== "BLACKJACK");
-      document.getElementById("casinoGameRoulette").classList.toggle("hidden", game !== "ROULETTE");
-      document.getElementById("casinoGameSlots").classList.toggle("hidden", game !== "SLOTS");
-
-      const games = ["BLACKJACK", "ROULETTE", "SLOTS"];
-      games.forEach(g => {
-        const btn = document.getElementById(`cTab-${g}`);
-        if (g === game) {
-          btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition bg-brand-card border border-brand-green text-brand-green";
-        } else {
-          btn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition bg-brand-surface border border-brand-border text-slate-400 hover:text-white";
-        }
+      ["BLACKJACK","ROULETTE","SLOTS"].forEach(g => {
+        const box = document.getElementById(g === "BLACKJACK" ? "blackjackGameBox" : (g === "ROULETTE" ? "rouletteGameBox" : "slotsGameBox"));
+        const btn = document.getElementById(`tab${g.charAt(0)+g.slice(1).toLowerCase()}Btn`);
+        box.classList.toggle("hidden", g !== game);
+        if (btn) btn.className = g === game
+          ? "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 whitespace-nowrap transition"
+          : "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition";
       });
     }
 
-    // --- BLACKJACK LOGIC ---
     function setBjChip(amt) {
       if (bjGameInProgress) return;
       bjWager = amt;
-      document.getElementById("bjCurrentBet").textContent = `$${amt.toFixed(2)}`;
-      document.querySelectorAll(".bj-chip").forEach(b => {
-        if (parseInt(b.dataset.amt, 10) === amt) {
-          b.className = "bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-green text-black border border-brand-green transition active-chip";
-        } else {
-          b.className = "bj-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-brand-green transition";
-        }
-      });
+      document.getElementById("bjBetDisplay").textContent = `$${amt.toFixed(2)}`;
     }
 
     function createDeck() {
-      const suits = ["♠", "♥", "♦", "♣"];
-      const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
-      const deck = [];
-      for (const s of suits) {
-        for (const r of ranks) {
-          let val = parseInt(r, 10);
-          if (["J", "Q", "K"].includes(r)) val = 10;
-          if (r === "A") val = 11;
-          deck.push({ rank: r, suit: s, value: val, isRed: s === "♥" || s === "♦" });
-        }
+      const suits = ["♠","♥","♦","♣"], ranks = ["2","3","4","5","6","7","8","9","10","J","Q","K","A"], deck = [];
+      for (const s of suits) for (const r of ranks) {
+        let v = parseInt(r) || (r === "A" ? 11 : 10);
+        deck.push({ rank: r, suit: s, value: v, isRed: s === "♥" || s === "♦" });
       }
-      // Shuffle
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
+      for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i+1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
       return deck;
     }
 
-    function calculateHand(hand) {
-      let score = 0;
-      let aces = 0;
-      hand.forEach(card => {
-        score += card.value;
-        if (card.rank === "A") aces += 1;
-      });
-      while (score > 21 && aces > 0) {
-        score -= 10;
-        aces -= 1;
-      }
+    function calcHand(hand) {
+      let score = 0, aces = 0;
+      hand.forEach(c => { score += c.value; if (c.rank === "A") aces++; });
+      while (score > 21 && aces > 0) { score -= 10; aces--; }
       return score;
     }
 
-    function renderHand(containerId, hand, hideSecondCard = false) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = hand.map((card, idx) => {
-        if (hideSecondCard && idx === 1) {
-          return `
-            <div class="w-16 h-24 rounded-xl bg-gradient-to-tr from-blue-900 to-indigo-950 border-2 border-indigo-400 flex flex-col items-center justify-center text-indigo-300 font-black shadow-xl">
-              <i data-lucide="shield" class="w-6 h-6"></i>
-              <span class="text-[9px] uppercase mt-1 tracking-wider">APEX</span>
-            </div>
-          `;
-        }
-        return `
-          <div class="w-16 h-24 rounded-xl bg-white text-black border-2 border-slate-300 flex flex-col justify-between p-1.5 shadow-xl select-none">
-            <span class="text-xs font-black leading-none ${card.isRed ? 'text-red-600' : 'text-black'}">${card.rank}${card.suit}</span>
-            <span class="text-xl font-black text-center ${card.isRed ? 'text-red-600' : 'text-black'}">${card.suit}</span>
-            <span class="text-xs font-black leading-none self-end ${card.isRed ? 'text-red-600' : 'text-black'}">${card.rank}</span>
-          </div>
-        `;
+    function renderHand(id, hand, hideSecond = false) {
+      document.getElementById(id).innerHTML = hand.map((c, i) => {
+        if (hideSecond && i === 1) return `<div class="w-16 h-24 rounded-xl bg-gradient-to-br from-blue-900 to-indigo-950 border-2 border-indigo-400/60 flex items-center justify-center text-indigo-300 font-black text-2xl shadow-xl">🂠</div>`;
+        return `<div class="w-16 h-24 rounded-xl bg-white text-black border-2 border-slate-200 flex flex-col justify-between p-1.5 shadow-xl select-none">
+          <span class="text-xs font-black leading-none ${c.isRed ? 'text-red-600' : 'text-slate-900'}">${c.rank}${c.suit}</span>
+          <span class="text-xl font-black text-center ${c.isRed ? 'text-red-600' : 'text-slate-900'}">${c.suit}</span>
+          <span class="text-xs font-black leading-none self-end ${c.isRed ? 'text-red-600' : 'text-slate-900'}">${c.rank}</span>
+        </div>`;
       }).join('');
-      lucide.createIcons();
     }
 
     function startBlackjackHand() {
-      if (userBalance < bjWager) {
-        showToast("Insufficient Balance", "You don't have enough balance for this hand.");
-        return;
-      }
-
-      userBalance -= bjWager;
-      saveBalance();
-
+      if (userBalance < bjWager) { showToast("Insufficient Funds", "Deposit more to play."); return; }
+      userBalance -= bjWager; saveBalance();
       bjDeck = createDeck();
       bjPlayerHand = [bjDeck.pop(), bjDeck.pop()];
       bjDealerHand = [bjDeck.pop(), bjDeck.pop()];
       bjGameInProgress = true;
 
-      document.getElementById("btnBjDeal").disabled = true;
-      document.getElementById("btnBjDeal").classList.add("opacity-40", "pointer-events-none");
-      document.getElementById("btnBjHit").disabled = false;
-      document.getElementById("btnBjStand").disabled = false;
-      document.getElementById("btnBjDouble").disabled = userBalance < bjWager;
+      ["bjHitBtn","bjStandBtn","bjDoubleBtn"].forEach(id => {
+        const el = document.getElementById(id);
+        el.disabled = false;
+        el.className = el.className.replace("bg-slate-800 text-slate-500 cursor-not-allowed", "bg-brand-card border border-brand-green text-brand-green hover:bg-brand-green hover:text-black");
+      });
+      document.getElementById("bjDealBtn").disabled = true;
 
       renderHand("dealerCards", bjDealerHand, true);
-      renderHand("playerCards", bjPlayerHand, false);
+      renderHand("playerCards", bjPlayerHand);
+      const pScore = calcHand(bjPlayerHand);
+      document.getElementById("playerScoreDisplay").textContent = `Score: ${pScore}`;
+      document.getElementById("dealerScoreDisplay").textContent = `Score: ${bjDealerHand[0].value}+?`;
+      document.getElementById("bjStatusMsg").textContent = "";
 
-      const pScore = calculateHand(bjPlayerHand);
-      document.getElementById("playerScoreBadge").textContent = `Score: ${pScore}`;
-      document.getElementById("dealerScoreBadge").textContent = `Score: ${bjDealerHand[0].value} + ?`;
-
-      const banner = document.getElementById("bjStatusBanner");
-      banner.innerHTML = `<span class="text-xs font-bold text-emerald-300 bg-black/60 px-4 py-1.5 rounded-full border border-emerald-500/40">Hand in progress... Hit, Stand, or Double.</span>`;
-
-      // Check Natural Blackjack
-      if (pScore === 21) {
-        endBlackjackHand("NATURAL_BLACKJACK");
-      }
+      if (pScore === 21) endBlackjackHand("NATURAL_BJ");
     }
 
     function blackjackHit() {
       if (!bjGameInProgress) return;
       bjPlayerHand.push(bjDeck.pop());
-      renderHand("playerCards", bjPlayerHand, false);
-
-      const pScore = calculateHand(bjPlayerHand);
-      document.getElementById("playerScoreBadge").textContent = `Score: ${pScore}`;
-      document.getElementById("btnBjDouble").disabled = true;
-
-      if (pScore > 21) {
-        endBlackjackHand("PLAYER_BUST");
-      }
+      renderHand("playerCards", bjPlayerHand);
+      const pScore = calcHand(bjPlayerHand);
+      document.getElementById("playerScoreDisplay").textContent = `Score: ${pScore}`;
+      document.getElementById("bjDoubleBtn").disabled = true;
+      if (pScore > 21) endBlackjackHand("PLAYER_BUST");
     }
 
     function blackjackDouble() {
       if (!bjGameInProgress || userBalance < bjWager) return;
-      userBalance -= bjWager;
-      bjWager *= 2;
-      document.getElementById("bjCurrentBet").textContent = `$${bjWager.toFixed(2)}`;
+      userBalance -= bjWager; bjWager *= 2;
+      document.getElementById("bjBetDisplay").textContent = `$${bjWager.toFixed(2)}`;
       saveBalance();
-
       bjPlayerHand.push(bjDeck.pop());
-      renderHand("playerCards", bjPlayerHand, false);
-      const pScore = calculateHand(bjPlayerHand);
-      document.getElementById("playerScoreBadge").textContent = `Score: ${pScore}`;
-
-      if (pScore > 21) {
-        endBlackjackHand("PLAYER_BUST");
-      } else {
-        blackjackStand();
-      }
+      renderHand("playerCards", bjPlayerHand);
+      const pScore = calcHand(bjPlayerHand);
+      document.getElementById("playerScoreDisplay").textContent = `Score: ${pScore}`;
+      if (pScore > 21) endBlackjackHand("PLAYER_BUST");
+      else blackjackStand();
     }
 
     function blackjackStand() {
       if (!bjGameInProgress) return;
-      // Dealer AI plays (hits on soft 17)
-      let dScore = calculateHand(bjDealerHand);
-      while (dScore < 17) {
-        bjDealerHand.push(bjDeck.pop());
-        dScore = calculateHand(bjDealerHand);
-      }
-
-      renderHand("dealerCards", bjDealerHand, false);
-      document.getElementById("dealerScoreBadge").textContent = `Score: ${dScore}`;
-
-      const pScore = calculateHand(bjPlayerHand);
-
-      if (dScore > 21) {
-        endBlackjackHand("DEALER_BUST");
-      } else if (pScore > dScore) {
-        endBlackjackHand("PLAYER_WIN");
-      } else if (pScore < dScore) {
-        endBlackjackHand("DEALER_WIN");
-      } else {
-        endBlackjackHand("PUSH");
-      }
+      let dScore = calcHand(bjDealerHand);
+      while (dScore < 17) { bjDealerHand.push(bjDeck.pop()); dScore = calcHand(bjDealerHand); }
+      renderHand("dealerCards", bjDealerHand);
+      document.getElementById("dealerScoreDisplay").textContent = `Score: ${dScore}`;
+      const pScore = calcHand(bjPlayerHand);
+      if (dScore > 21) endBlackjackHand("DEALER_BUST");
+      else if (pScore > dScore) endBlackjackHand("PLAYER_WIN");
+      else if (pScore < dScore) endBlackjackHand("DEALER_WIN");
+      else endBlackjackHand("PUSH");
     }
 
     function endBlackjackHand(reason) {
       bjGameInProgress = false;
-      renderHand("dealerCards", bjDealerHand, false);
-      const dScore = calculateHand(bjDealerHand);
-      const pScore = calculateHand(bjPlayerHand);
-      document.getElementById("dealerScoreBadge").textContent = `Score: ${dScore}`;
+      renderHand("dealerCards", bjDealerHand);
+      const dScore = calcHand(bjDealerHand);
+      const pScore = calcHand(bjPlayerHand);
+      document.getElementById("dealerScoreDisplay").textContent = `Score: ${dScore}`;
 
-      const banner = document.getElementById("bjStatusBanner");
+      let msg = "", won = false;
+      if (reason === "NATURAL_BJ") { const p = bjWager * 2.5; userBalance += p; won = true; casinoStats.netProfit += (p - bjWager); msg = `🃏 BLACKJACK! Won $${p.toFixed(2)} (3:2)`; }
+      else if (reason === "PLAYER_BUST") { casinoStats.netProfit -= bjWager; msg = `Bust! (${pScore}) You lose $${bjWager.toFixed(2)}`; }
+      else if (reason === "DEALER_BUST") { const p = bjWager * 2; userBalance += p; won = true; casinoStats.netProfit += bjWager; msg = `Dealer bust (${dScore})! Won $${p.toFixed(2)}`; }
+      else if (reason === "PLAYER_WIN") { const p = bjWager * 2; userBalance += p; won = true; casinoStats.netProfit += bjWager; msg = `You win ${pScore} vs ${dScore}! Won $${p.toFixed(2)}`; }
+      else if (reason === "DEALER_WIN") { casinoStats.netProfit -= bjWager; msg = `Dealer wins ${dScore} vs ${pScore}. Lost $${bjWager.toFixed(2)}`; }
+      else if (reason === "PUSH") { userBalance += bjWager; msg = `Push ${pScore} - bet refunded.`; }
 
-      if (reason === "NATURAL_BLACKJACK") {
-        const payout = bjWager * 2.5; // 3:2 payout + return of bet
-        userBalance += payout;
-        casinoStats.wins += 1;
-        casinoStats.netProfit += (payout - bjWager);
-        banner.innerHTML = `<span class="text-sm font-black text-brand-green bg-black/80 px-4 py-1.5 rounded-full border border-brand-green">BLACKJACK! You Won $${payout.toFixed(2)} (3:2) 🎉</span>`;
-      } else if (reason === "PLAYER_BUST") {
-        casinoStats.losses += 1;
-        casinoStats.netProfit -= bjWager;
-        banner.innerHTML = `<span class="text-sm font-black text-red-400 bg-black/80 px-4 py-1.5 rounded-full border border-red-500/40">Busted (${pScore})! Dealer wins -$${bjWager.toFixed(2)}.</span>`;
-      } else if (reason === "DEALER_BUST") {
-        const payout = bjWager * 2;
-        userBalance += payout;
-        casinoStats.wins += 1;
-        casinoStats.netProfit += bjWager;
-        banner.innerHTML = `<span class="text-sm font-black text-brand-green bg-black/80 px-4 py-1.5 rounded-full border border-brand-green">Dealer Busted (${dScore})! You Won $${payout.toFixed(2)} 🎉</span>`;
-      } else if (reason === "PLAYER_WIN") {
-        const payout = bjWager * 2;
-        userBalance += payout;
-        casinoStats.wins += 1;
-        casinoStats.netProfit += bjWager;
-        banner.innerHTML = `<span class="text-sm font-black text-brand-green bg-black/80 px-4 py-1.5 rounded-full border border-brand-green">You Win with ${pScore} vs ${dScore}! Won $${payout.toFixed(2)} 🎉</span>`;
-      } else if (reason === "DEALER_WIN") {
-        casinoStats.losses += 1;
-        casinoStats.netProfit -= bjWager;
-        banner.innerHTML = `<span class="text-sm font-black text-red-400 bg-black/80 px-4 py-1.5 rounded-full border border-red-500/40">Dealer wins with ${dScore} vs ${pScore}.</span>`;
-      } else if (reason === "PUSH") {
-        userBalance += bjWager; // Refund
-        banner.innerHTML = `<span class="text-sm font-black text-yellow-400 bg-black/80 px-4 py-1.5 rounded-full border border-yellow-400/40">Push / Tie (${pScore} each). Bet refunded.</span>`;
-      }
+      if (won) casinoStats.wins++; else if (reason !== "PUSH") casinoStats.losses++;
+      document.getElementById("bjStatusMsg").textContent = msg;
+      document.getElementById("bjStatusMsg").className = `mt-4 font-black text-sm h-6 ${won ? 'text-brand-green' : (reason === 'PUSH' ? 'text-yellow-400' : 'text-red-400')}`;
 
-      saveBalance();
-      updateStatsDisplay();
-
-      // Reset controls
-      document.getElementById("btnBjDeal").disabled = false;
-      document.getElementById("btnBjDeal").classList.remove("opacity-40", "pointer-events-none");
-      document.getElementById("btnBjHit").disabled = true;
-      document.getElementById("btnBjStand").disabled = true;
-      document.getElementById("btnBjDouble").disabled = true;
-    }
-
-    // --- ROULETTE LOGIC ---
-    function setRouletteChip(amt) {
-      if (rIsSpinning) return;
-      rWager = amt;
-      document.querySelectorAll(".r-chip").forEach(b => {
-        if (parseInt(b.dataset.amt, 10) === amt) {
-          b.className = "r-chip px-3 py-1.5 rounded-full text-xs font-black bg-yellow-400 text-black border border-yellow-400 transition active-chip";
-        } else {
-          b.className = "r-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-yellow-400 transition";
-        }
+      saveBalance(); updateStatsDisplay();
+      ["bjHitBtn","bjStandBtn","bjDoubleBtn"].forEach(id => {
+        const el = document.getElementById(id);
+        el.disabled = true;
+        el.className = el.className.replace(/bg-brand-card.*?text-black/g, "bg-slate-800 text-slate-500 cursor-not-allowed").replace("hover:bg-brand-green hover:text-black","");
+        el.className = "flex-1 sm:flex-initial px-5 py-2.5 rounded-xl font-black text-xs bg-slate-800 text-slate-500 cursor-not-allowed uppercase transition";
       });
-      document.getElementById("rouletteCurrentBetDisplay").textContent = `$${rWager} on ${rSelectedBetName}`;
+      document.getElementById("bjDealBtn").disabled = false;
     }
 
-    function selectRouletteBet(type, name, multiplier) {
-      if (rIsSpinning) return;
-      rSelectedBetType = type;
-      rSelectedBetName = name;
-      rSelectedMultiplier = multiplier;
-      document.getElementById("rouletteCurrentBetDisplay").textContent = `$${rWager} on ${name}`;
-      showToast("Roulette Selection", `Wager set on ${name}`);
-    }
+    // ==========================================
+    // CASINO — ROULETTE
+    // ==========================================
+    function setRouletteChip(amt) { if (!rIsSpinning) { rWager = amt; document.getElementById("rouletteBetDisplay").textContent = `${rSelectedBetName} ($${amt})`; } }
+    function selectRouletteBet(type, name, mult) { rSelectedBet = type; rSelectedBetName = name; rMultiplier = mult; document.getElementById("rouletteBetDisplay").textContent = `${name} ($${rWager})`; showToast("Bet Selected", name); }
 
     function spinRoulette() {
-      if (rIsSpinning) return;
-      if (userBalance < rWager) {
-        showToast("Insufficient Balance", "You don't have enough balance for this spin.");
-        return;
-      }
-
-      userBalance -= rWager;
-      saveBalance();
+      if (rIsSpinning || userBalance < rWager) { if (userBalance < rWager) showToast("Insufficient Funds", "Deposit more to play."); return; }
+      userBalance -= rWager; saveBalance();
       rIsSpinning = true;
+      document.getElementById("rouletteSpinBtn").disabled = true;
+      document.getElementById("rouletteStatusMsg").textContent = "Spinning...";
+      const wheel = document.getElementById("wheelGraphic");
+      wheel.classList.add("spinning-wheel");
 
-      const numEl = document.getElementById("rouletteResultNumber");
-      const colEl = document.getElementById("rouletteResultColor");
-      const outText = document.getElementById("rouletteOutcomeText");
-      const btn = document.getElementById("btnSpinRoulette");
+      setTimeout(() => {
+        wheel.classList.remove("spinning-wheel");
+        const RED_NUMS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+        const num = Math.floor(Math.random() * 37);
+        let color = num === 0 ? "GREEN" : (RED_NUMS.includes(num) ? "RED" : "BLACK");
+        document.getElementById("rouletteResultNumber").textContent = num;
+        document.getElementById("rouletteResultNumber").className = `text-white ${color === 'RED' ? '!text-red-400' : (color === 'GREEN' ? '!text-emerald-400' : '')}`;
 
-      btn.disabled = true;
-      btn.classList.add("opacity-50", "pointer-events-none");
-      outText.textContent = "Spinning the wheel...";
+        let won = false;
+        if (rSelectedBet === "RED" && color === "RED") won = true;
+        if (rSelectedBet === "BLACK" && color === "BLACK") won = true;
+        if (rSelectedBet === "EVEN" && num > 0 && num % 2 === 0) won = true;
+        if (rSelectedBet === "ODD" && num > 0 && num % 2 !== 0) won = true;
+        if (rSelectedBet === "LOW" && num >= 1 && num <= 18) won = true;
+        if (rSelectedBet === "HIGH" && num >= 19 && num <= 36) won = true;
+        if (rSelectedBet === "1ST12" && num >= 1 && num <= 12) won = true;
+        if (rSelectedBet === "2ND12" && num >= 13 && num <= 24) won = true;
+        if (rSelectedBet === "0" && num === 0) won = true;
 
-      let counter = 0;
-      const spinInterval = setInterval(() => {
-        const randNum = Math.floor(Math.random() * 37);
-        numEl.textContent = randNum;
-        counter++;
-        if (counter > 20) {
-          clearInterval(spinInterval);
-          finishRouletteSpin();
-        }
-      }, 75);
-    }
-
-    function finishRouletteSpin() {
-      const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-      const winningNumber = Math.floor(Math.random() * 37); // 0 to 36
-
-      let color = "GREEN";
-      if (winningNumber !== 0) {
-        color = RED_NUMBERS.includes(winningNumber) ? "RED" : "BLACK";
-      }
-
-      const numEl = document.getElementById("rouletteResultNumber");
-      const colEl = document.getElementById("rouletteResultColor");
-      const outText = document.getElementById("rouletteOutcomeText");
-
-      numEl.textContent = winningNumber;
-      colEl.textContent = `${color} • ${winningNumber === 0 ? 'Zero' : (winningNumber % 2 === 0 ? 'Even' : 'Odd')}`;
-      colEl.className = `text-[10px] font-black uppercase mt-1 ${color === 'RED' ? 'text-red-400' : (color === 'BLACK' ? 'text-slate-300' : 'text-emerald-400')}`;
-
-      // Check win condition
-      let didWin = false;
-      if (rSelectedBetType === "RED" && color === "RED") didWin = true;
-      if (rSelectedBetType === "BLACK" && color === "BLACK") didWin = true;
-      if (rSelectedBetType === "EVEN" && winningNumber !== 0 && winningNumber % 2 === 0) didWin = true;
-      if (rSelectedBetType === "ODD" && winningNumber !== 0 && winningNumber % 2 !== 0) didWin = true;
-      if (rSelectedBetType === "1ST12" && winningNumber >= 1 && winningNumber <= 12) didWin = true;
-      if (rSelectedBetType === "2ND12" && winningNumber >= 13 && winningNumber <= 24) didWin = true;
-      if (rSelectedBetType === "3RD12" && winningNumber >= 25 && winningNumber <= 36) didWin = true;
-      if (rSelectedBetType.startsWith("NUM_") && parseInt(rSelectedBetType.split("_")[1], 10) === winningNumber) didWin = true;
-
-      if (didWin) {
-        const profit = rWager * rSelectedMultiplier;
-        const totalPayout = rWager + profit;
-        userBalance += totalPayout;
-        casinoStats.wins += 1;
-        casinoStats.netProfit += profit;
-        outText.innerHTML = `<span class="text-brand-green font-black text-sm">🎉 WINNER! Ball landed on ${winningNumber} (${color})! Paid $${totalPayout.toFixed(2)}</span>`;
-      } else {
-        casinoStats.losses += 1;
-        casinoStats.netProfit -= rWager;
-        outText.innerHTML = `<span class="text-red-400 font-bold text-xs">Ball landed on ${winningNumber} (${color}). Better luck on the next spin!</span>`;
-      }
-
-      saveBalance();
-      updateStatsDisplay();
-
-      rIsSpinning = false;
-      const btn = document.getElementById("btnSpinRoulette");
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
-
-    // --- SLOTS LOGIC (APEX 777) ---
-    function setSlotChip(amt) {
-      if (slotIsSpinning) return;
-      slotWager = amt;
-      document.getElementById("slotBetDisplay").textContent = `$${amt.toFixed(2)}`;
-      document.querySelectorAll(".slot-chip").forEach(b => {
-        if (parseInt(b.dataset.amt, 10) === amt) {
-          b.className = "slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-purple-600 text-white border border-purple-500 transition active-chip";
+        if (won) {
+          const profit = rWager * rMultiplier;
+          userBalance += rWager + profit;
+          casinoStats.wins++; casinoStats.netProfit += profit;
+          document.getElementById("rouletteStatusMsg").textContent = `🎉 Number ${num} (${color})! Won $${(rWager + profit).toFixed(2)}!`;
         } else {
-          b.className = "slot-chip px-3 py-1.5 rounded-full text-xs font-black bg-brand-surface border border-slate-600 text-white hover:border-purple-400 transition";
+          casinoStats.losses++; casinoStats.netProfit -= rWager;
+          document.getElementById("rouletteStatusMsg").textContent = `Number ${num} (${color}). Better luck next spin!`;
         }
-      });
+        saveBalance(); updateStatsDisplay();
+        rIsSpinning = false;
+        document.getElementById("rouletteSpinBtn").disabled = false;
+      }, 2600);
     }
+
+    // ==========================================
+    // CASINO — SLOTS
+    // ==========================================
+    function setSlotChip(amt) { if (!slotIsSpinning) { slotWager = amt; document.getElementById("slotBetDisplay").textContent = `$${amt.toFixed(2)}`; } }
 
     function spinSlots() {
-      if (slotIsSpinning) return;
-      if (userBalance < slotWager) {
-        showToast("Insufficient Balance", "You don't have enough balance for this spin.");
-        return;
-      }
-
-      userBalance -= slotWager;
-      saveBalance();
+      if (slotIsSpinning || userBalance < slotWager) { if (userBalance < slotWager) showToast("Insufficient Funds", "Deposit more to play."); return; }
+      userBalance -= slotWager; saveBalance();
       slotIsSpinning = true;
+      document.getElementById("slotSpinBtn").disabled = true;
+      document.getElementById("slotStatusMsg").textContent = "Spinning...";
 
-      const r1 = document.getElementById("slotReel1");
-      const r2 = document.getElementById("slotReel2");
-      const r3 = document.getElementById("slotReel3");
-      const outText = document.getElementById("slotOutcomeText");
-      const btn = document.getElementById("btnSpinSlots");
+      const reels = [document.getElementById("reel1"), document.getElementById("reel2"), document.getElementById("reel3")];
+      reels.forEach(r => r.querySelector("span").classList.add("slot-animate"));
 
-      btn.disabled = true;
-      btn.classList.add("opacity-50", "pointer-events-none");
-      outText.textContent = "Rolling the reels...";
-
-      r1.classList.add("reel-spinning");
-      r2.classList.add("reel-spinning");
-      r3.classList.add("reel-spinning");
-
-      // Random animate symbols
       let count = 0;
-      const spinTimer = setInterval(() => {
-        r1.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-        r2.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-        r3.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
-        count++;
-        if (count > 18) {
-          clearInterval(spinTimer);
-          finishSlotsSpin();
+      const timer = setInterval(() => {
+        reels.forEach(r => r.querySelector("span").textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]);
+        if (++count > 20) {
+          clearInterval(timer);
+          reels.forEach(r => r.querySelector("span").classList.remove("slot-animate"));
+          const results = reels.map(r => { r.querySelector("span").textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]; return r.querySelector("span").textContent; });
+          const [s1, s2, s3] = results;
+          let mult = 0;
+          if (s1 === s2 && s2 === s3) {
+            if (s1 === "7️⃣") mult = 50;
+            else if (s1 === "💎") mult = 25;
+            else if (s1 === "🔔") mult = 15;
+            else if (s1 === "🍒") mult = 5;
+            else mult = 3;
+          }
+          if (mult > 0) {
+            const payout = slotWager * mult;
+            userBalance += payout;
+            casinoStats.wins++; casinoStats.netProfit += (payout - slotWager);
+            document.getElementById("slotStatusMsg").textContent = `🎰 JACKPOT! ${s1}${s2}${s3} — Won $${payout.toFixed(2)}! (${mult}x)`;
+          } else {
+            casinoStats.losses++; casinoStats.netProfit -= slotWager;
+            document.getElementById("slotStatusMsg").textContent = `${s1}${s2}${s3} — No match. Try again!`;
+          }
+          saveBalance(); updateStatsDisplay();
+          slotIsSpinning = false;
+          document.getElementById("slotSpinBtn").disabled = false;
         }
       }, 70);
     }
 
-    function finishSlotsSpin() {
-      const r1 = document.getElementById("slotReel1");
-      const r2 = document.getElementById("slotReel2");
-      const r3 = document.getElementById("slotReel3");
-      const outText = document.getElementById("slotOutcomeText");
-      const btn = document.getElementById("btnSpinSlots");
-
-      r1.classList.remove("reel-spinning");
-      r2.classList.remove("reel-spinning");
-      r3.classList.remove("reel-spinning");
-
-      // Determine outcomes with weighted odds
-      const rollReel = () => {
-        const rand = Math.random();
-        if (rand < 0.12) return "7️⃣";
-        if (rand < 0.28) return "💎";
-        if (rand < 0.48) return "🔔";
-        if (rand < 0.72) return "🍇";
-        return "🍒";
-      };
-
-      const res1 = rollReel();
-      const res2 = rollReel();
-      const res3 = rollReel();
-
-      r1.textContent = res1;
-      r2.textContent = res2;
-      r3.textContent = res3;
-
-      let multiplier = 0;
-      if (res1 === res2 && res2 === res3) {
-        if (res1 === "7️⃣") multiplier = 50;
-        else if (res1 === "💎") multiplier = 25;
-        else if (res1 === "🔔") multiplier = 15;
-        else if (res1 === "🍇") multiplier = 8;
-        else if (res1 === "🍒") multiplier = 5;
-      } else if (res1 === "🍒" && res2 === "🍒") {
-        multiplier = 2; // Two cherries mini prize
-      }
-
-      if (multiplier > 0) {
-        const payout = slotWager * multiplier;
-        const profit = payout - slotWager;
-        userBalance += payout;
-        casinoStats.wins += 1;
-        casinoStats.netProfit += profit;
-        outText.innerHTML = `<span class="text-yellow-400 font-black text-sm">🎰 JACKPOT! 3x ${res1} Hit! Won $${payout.toFixed(2)} (${multiplier}x) 🎉</span>`;
-        showToast("Slot Winner!", `Hit ${multiplier}x payout for $${payout.toFixed(2)}!`);
-      } else {
-        casinoStats.losses += 1;
-        casinoStats.netProfit -= slotWager;
-        outText.innerHTML = `<span class="text-purple-300 font-bold text-xs">No match this pull. Spin again to hit the 50x 777 Jackpot!</span>`;
-      }
-
-      saveBalance();
-      updateStatsDisplay();
-
-      slotIsSpinning = false;
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "pointer-events-none");
-    }
-
     // ==========================================
-    // UI HELPERS & SEARCH FILTERS
+    // UI HELPERS
     // ==========================================
     function setSportFilter(filter) {
       currentFilter = filter;
-      document.querySelectorAll(".sport-nav-btn").forEach(b => {
-        b.classList.remove("bg-brand-card", "text-brand-green", "font-bold");
-        b.classList.add("hover:text-white");
-      });
-      const activeNav = document.getElementById(`nav-${filter}`);
-      if (activeNav) {
-        activeNav.classList.add("bg-brand-card", "text-brand-green", "font-bold");
-        activeNav.classList.remove("hover:text-white");
-      }
-
-      const titleMap = {
-        'ALL': 'MATCHUP & SCHEDULE',
-        'NFL': 'NFL FOOTBALL LINES & PROPS',
-        'NBA': 'NBA BASKETBALL LINES & PROPS',
-        'EPL': 'PREMIER LEAGUE LINES & PROPS',
-        'LIVE': 'LIVE IN-PLAY GAMES'
-      };
+      document.querySelectorAll(".sport-nav-btn").forEach(b => b.classList.remove("bg-brand-card", "text-brand-green", "font-bold", "active-nav"));
+      const nav = document.getElementById(`nav-${filter}`);
+      if (nav) nav.classList.add("bg-brand-card", "text-brand-green", "font-bold");
+      const titleMap = { 'ALL': 'MATCHUP & SCHEDULE', 'NFL': 'NFL FOOTBALL LINES & PROPS', 'NBA': 'NBA BASKETBALL LINES & PROPS', 'EPL': 'PREMIER LEAGUE LINES & PROPS', 'LIVE': 'LIVE IN-PLAY GAMES' };
       document.getElementById("activeSectionTitle").textContent = titleMap[filter] || 'MATCHUP & SCHEDULE';
       renderDateTabs();
       renderGames();
     }
 
-    function handleSearch() {
-      searchQuery = document.getElementById("searchInput").value;
-      renderGames();
-    }
+    function handleSearch() { searchQuery = document.getElementById("searchInput").value; renderGames(); }
 
     function saveBalance() {
       localStorage.setItem("apex_balance", userBalance.toString());
@@ -2185,7 +1610,7 @@
       if (amt && !isNaN(amt) && parseFloat(amt) > 0) {
         userBalance += parseFloat(amt);
         saveBalance();
-        showToast("Funds Deposited", `$${parseFloat(amt).toFixed(2)} added to your mock balance.`);
+        showToast("Deposit Successful", `$${parseFloat(amt).toFixed(2)} added to your balance.`);
       }
     }
 
@@ -2207,19 +1632,9 @@
       aside.classList.toggle("z-50");
     }
 
-    function toggleMobileSidebar() {
-      const aside = document.getElementById("sidebar");
-      aside.classList.toggle("hidden");
-      aside.classList.toggle("fixed");
-      aside.classList.toggle("inset-y-0");
-      aside.classList.toggle("left-0");
-      aside.classList.toggle("z-50");
-      aside.classList.toggle("bg-brand-dark/95");
-      aside.classList.toggle("p-4");
-      aside.classList.toggle("w-64");
-    }
-
-    // INITIALIZATION & AUTO-POLLING
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
     document.addEventListener("DOMContentLoaded", () => {
       saveBalance();
       updateStatsDisplay();
@@ -2227,10 +1642,7 @@
       renderMyBets();
       renderDateTabs();
       fetchLiveOdds();
-
-      setInterval(() => {
-        fetchLiveOdds(false);
-      }, 30000);
+      setInterval(() => fetchLiveOdds(false), 30000);
     });
   </script>
 </body>
