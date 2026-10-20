@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Apex Sportsbook & Casino | NFL, NBA, EPL, Blackjack & Roulette</title>
+  <title>Apex Sportsbook & Casino | NFL, NBA, EPL, Blackjack, Roulette & Slots</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -45,6 +45,12 @@
       100% { transform: rotate(1440deg); }
     }
     .spinning-wheel { animation: spinWheel 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    @keyframes slotBounce {
+      0% { transform: translateY(-10px); }
+      50% { transform: translateY(10px); }
+      100% { transform: translateY(0); }
+    }
+    .slot-animate { animation: slotBounce 0.15s infinite; }
   </style>
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-green selection:text-black">
@@ -83,7 +89,7 @@
         <button onclick="switchMainView('CASINO')" id="hubCasinoBtn" class="px-3.5 py-1.5 rounded-lg text-xs font-black text-slate-400 hover:text-white transition flex items-center gap-1.5">
           <i data-lucide="dices" class="w-3.5 h-3.5"></i>
           <span>Casino</span>
-          <span class="bg-amber-500/20 text-amber-400 text-[9px] px-1.5 py-0.2 rounded font-black border border-amber-500/30">HOT</span>
+          <span class="bg-amber-500/20 text-amber-400 text-[9px] px-1.5 py-0.2 rounded font-black border border-amber-500/30">3 GAMES</span>
         </button>
       </div>
 
@@ -103,14 +109,12 @@
     <div class="flex items-center gap-3">
       <!-- DUAL STATS PILLS: SPORTSBOOK & CASINO -->
       <div class="hidden md:flex items-center gap-2">
-        <!-- Sports Stats -->
         <div id="headerSportsStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-green/40 px-3 py-1.5 rounded-xl text-xs font-bold transition">
           <span class="text-slate-400 text-[10px] uppercase font-bold">🏈 Sports:</span>
           <span id="sportsStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
           <span id="sportsStatsHitRate" class="text-brand-green font-mono font-black">0.0% Win</span>
         </div>
 
-        <!-- Casino Stats -->
         <div id="headerCasinoStatsPill" class="flex items-center gap-2 bg-brand-dark border border-brand-border px-3 py-1.5 rounded-xl text-xs font-bold transition">
           <span class="text-slate-400 text-[10px] uppercase font-bold">🎰 Casino:</span>
           <span id="casinoStatsRecord" class="text-white font-mono font-black">0W - 0L</span>
@@ -176,14 +180,12 @@
 
       <!-- SEARCH & SPORT FILTER CONTROLS -->
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
-        <!-- Search -->
         <div class="relative flex-1 max-w-md">
           <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
           <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search teams or players (Mahomes, Allen, Henry, Tatum, Haaland)..."
             class="w-full bg-brand-card border border-brand-border rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-green transition" />
         </div>
 
-        <!-- Mobile Filter Chips -->
         <div class="flex xl:hidden gap-1.5 overflow-x-auto text-xs font-bold scrollbar-none">
           <button onclick="setSportFilter('ALL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap active-chip">All</button>
           <button onclick="setSportFilter('NFL')" class="bg-brand-card border border-brand-border px-3 py-1.5 rounded-lg whitespace-nowrap">🏈 NFL</button>
@@ -212,18 +214,22 @@
       </div>
     </main>
 
-    <!-- ==================== VIEW 2: CASINO (BLACKJACK & ROULETTE) ==================== -->
+    <!-- ==================== VIEW 2: CASINO (BLACKJACK, ROULETTE & SLOTS) ==================== -->
     <main id="casinoMainSection" class="hidden flex-1 min-w-0 space-y-6">
       
-      <!-- Casino Game Selector Tabs -->
-      <div class="flex items-center gap-3 border-b border-brand-border pb-4">
-        <button onclick="switchCasinoGame('BLACKJACK')" id="tabBlackjackBtn" class="px-5 py-2.5 rounded-xl font-black text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 transition">
+      <!-- Casino Game Selector Tabs (3 Games) -->
+      <div class="flex items-center gap-2.5 border-b border-brand-border pb-4 overflow-x-auto scrollbar-none">
+        <button onclick="switchCasinoGame('BLACKJACK')" id="tabBlackjackBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 whitespace-nowrap transition">
           <i data-lucide="spade" class="w-4 h-4 fill-black"></i>
           <span>Blackjack 21</span>
         </button>
-        <button onclick="switchCasinoGame('ROULETTE')" id="tabRouletteBtn" class="px-5 py-2.5 rounded-xl font-black text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 transition">
+        <button onclick="switchCasinoGame('ROULETTE')" id="tabRouletteBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition">
           <i data-lucide="disc" class="w-4 h-4 text-amber-400"></i>
-          <span>European Roulette</span>
+          <span>Roulette</span>
+        </button>
+        <button onclick="switchCasinoGame('SLOTS')" id="tabSlotsBtn" class="px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+          <span>Apex 777 Slots</span>
         </button>
       </div>
 
@@ -242,24 +248,17 @@
           </div>
         </div>
 
-        <!-- Dealer Side -->
         <div class="py-6 text-center border-b border-brand-border/40">
           <div class="text-xs font-bold text-slate-400 mb-2">DEALER HAND <span id="dealerScoreDisplay" class="ml-2 text-brand-green font-mono font-black"></span></div>
-          <div id="dealerCards" class="flex items-center justify-center gap-2 min-h-[96px]">
-            <!-- Dealer cards -->
-          </div>
+          <div id="dealerCards" class="flex items-center justify-center gap-2 min-h-[96px]"></div>
         </div>
 
-        <!-- Player Side -->
         <div class="py-6 text-center">
           <div class="text-xs font-bold text-slate-400 mb-2">YOUR HAND <span id="playerScoreDisplay" class="ml-2 text-brand-green font-mono font-black"></span></div>
-          <div id="playerCards" class="flex items-center justify-center gap-2 min-h-[96px]">
-            <!-- Player cards -->
-          </div>
+          <div id="playerCards" class="flex items-center justify-center gap-2 min-h-[96px]"></div>
           <div id="bjStatusMsg" class="mt-4 font-black text-base text-amber-300 h-6">Choose your wager and click Deal</div>
         </div>
 
-        <!-- Chips & Controls -->
         <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-2">
             <span class="text-xs text-slate-400 font-bold">Wager:</span>
@@ -329,6 +328,67 @@
             <button onclick="setRouletteChip(100)" class="w-10 h-10 rounded-full font-black text-xs border border-amber-500 bg-amber-950 text-amber-300">$100</button>
           </div>
           <button onclick="spinRoulette()" id="rouletteSpinBtn" class="w-full sm:w-auto px-8 py-3 rounded-xl font-black text-xs bg-amber-400 hover:bg-amber-300 text-black uppercase shadow-lg shadow-amber-400/20 transition">Spin Wheel</button>
+        </div>
+      </div>
+
+      <!-- GAME 3: APEX 777 VEGAS SLOTS -->
+      <div id="slotsGameBox" class="hidden bg-brand-card border border-brand-border rounded-2xl p-5 sm:p-6 shadow-2xl space-y-6">
+        <div class="flex items-center justify-between pb-4 border-b border-brand-border/60">
+          <div>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-5 h-5 text-purple-400"></i> Apex 777 Lucky Slots
+            </h3>
+            <p class="text-xs text-slate-400">Match 3 Lucky 7s for the 50x Mega Jackpot!</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Spin Wager</span>
+            <div id="slotBetDisplay" class="font-black text-brand-green text-base">$25.00</div>
+          </div>
+        </div>
+
+        <!-- 3-Reel Slot Window -->
+        <div class="py-8 bg-brand-dark rounded-2xl border-2 border-brand-border/80 flex items-center justify-center gap-3 sm:gap-6 shadow-inner">
+          <div id="reel1" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl">
+            <span>7️⃣</span>
+          </div>
+          <div id="reel2" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl">
+            <span>7️⃣</span>
+          </div>
+          <div id="reel3" class="w-20 h-24 sm:w-28 sm:h-32 bg-slate-900 border-2 border-purple-500/60 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-2xl">
+            <span>7️⃣</span>
+          </div>
+        </div>
+
+        <div id="slotStatusMsg" class="text-center font-black text-sm text-slate-300 h-5">Hit Spin to play!</div>
+
+        <!-- Paytable Legend -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] bg-brand-surface p-3 rounded-xl border border-brand-border">
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300">
+            <span>7️⃣ 7️⃣ 7️⃣</span> <span class="text-brand-green">50x</span>
+          </div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300">
+            <span>💎 💎 💎</span> <span class="text-brand-green">25x</span>
+          </div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300">
+            <span>🔔 🔔 🔔</span> <span class="text-brand-green">15x</span>
+          </div>
+          <div class="flex items-center justify-between px-2 font-bold text-slate-300">
+            <span>🍒 🍒 🍒</span> <span class="text-brand-green">5x</span>
+          </div>
+        </div>
+
+        <!-- Slots Controls -->
+        <div class="bg-brand-dark/95 border border-brand-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400 font-bold">Wager:</span>
+            <button onclick="setSlotChip(10)" class="w-10 h-10 rounded-full font-black text-xs border border-blue-500 bg-blue-950 text-blue-300 hover:scale-105 transition">$10</button>
+            <button onclick="setSlotChip(25)" class="w-10 h-10 rounded-full font-black text-xs border border-brand-green bg-emerald-950 text-brand-green hover:scale-105 transition">$25</button>
+            <button onclick="setSlotChip(50)" class="w-10 h-10 rounded-full font-black text-xs border border-purple-500 bg-purple-950 text-purple-300 hover:scale-105 transition">$50</button>
+            <button onclick="setSlotChip(100)" class="w-10 h-10 rounded-full font-black text-xs border border-amber-500 bg-amber-950 text-amber-300 hover:scale-105 transition">$100</button>
+          </div>
+          <button onclick="spinSlots()" id="slotSpinBtn" class="w-full sm:w-auto px-10 py-3 rounded-xl font-black text-xs bg-purple-500 hover:bg-purple-400 text-white uppercase shadow-lg shadow-purple-500/25 transition">
+            SPIN REELS
+          </button>
         </div>
       </div>
 
@@ -519,78 +579,50 @@
       const homeRoster = findTeamRoster(game.homeTeam.name) || { key: game.homeTeam.shortName, qb: `${game.homeTeam.shortName} QB`, rb: `${game.homeTeam.shortName} RB`, wr1: `${game.homeTeam.shortName} WR`, te: `${game.homeTeam.shortName} TE`, g1: `${game.homeTeam.shortName} Star`, g2: `${game.homeTeam.shortName} Guard`, f: `${game.homeTeam.shortName} Forward`, c: `${game.homeTeam.shortName} Center`, f1: `${game.homeTeam.shortName} Striker`, f2: `${game.homeTeam.shortName} Winger`, m: `${game.homeTeam.shortName} Mid` };
 
       if (game.sport === 'NFL') {
-        // 1. Passing Yards (3-4 QBs)
         props.push(
           { player: awayRoster.qb, team: game.awayTeam.shortName, cat: "Passing Yards", line: 242.5, over: -115, under: -115 },
-          { player: homeRoster.qb, team: game.homeTeam.shortName, cat: "Passing Yards", line: 248.5, over: -115, under: -115 }
-        );
-        // 2. Rushing Yards (3-4 RBs)
-        props.push(
+          { player: homeRoster.qb, team: game.homeTeam.shortName, cat: "Passing Yards", line: 248.5, over: -115, under: -115 },
           { player: awayRoster.rb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 68.5, over: -115, under: -115 },
           { player: homeRoster.rb, team: game.homeTeam.shortName, cat: "Rushing Yards", line: 72.5, over: -115, under: -115 },
-          { player: awayRoster.qb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 26.5, over: -110, under: -120 }
-        );
-        // 3. Receiving Yards (3-4 WRs / TEs)
-        props.push(
+          { player: awayRoster.qb, team: game.awayTeam.shortName, cat: "Rushing Yards", line: 26.5, over: -110, under: -120 },
           { player: awayRoster.wr1, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 68.5, over: -115, under: -115 },
           { player: homeRoster.wr1, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 74.5, over: -115, under: -115 },
           { player: awayRoster.te, team: game.awayTeam.shortName, cat: "Receiving Yards", line: 48.5, over: -110, under: -120 },
-          { player: homeRoster.te, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 52.5, over: -115, under: -115 }
-        );
-        // 4. Anytime Touchdown (3-4 Scorers)
-        props.push(
+          { player: homeRoster.te, team: game.homeTeam.shortName, cat: "Receiving Yards", line: 52.5, over: -115, under: -115 },
           { player: awayRoster.rb, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -110, isSingle: true },
           { player: homeRoster.rb, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: -125, isSingle: true },
           { player: awayRoster.wr1, team: game.awayTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +125, isSingle: true },
           { player: homeRoster.wr1, team: game.homeTeam.shortName, cat: "Anytime Touchdown", line: "Yes", over: +115, isSingle: true }
         );
       } else if (game.sport === 'NBA') {
-        // 1. Points (3-4 Players)
         props.push(
           { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Points", line: 26.5, over: -115, under: -115 },
           { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "Points", line: 27.5, over: -115, under: -115 },
           { player: awayRoster.g2, team: game.awayTeam.shortName, cat: "Points", line: 21.5, over: -110, under: -120 },
-          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Points", line: 22.5, over: -115, under: -115 }
-        );
-        // 2. Rebounds (3-4 Players)
-        props.push(
+          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Points", line: 22.5, over: -115, under: -115 },
           { player: awayRoster.c, team: game.awayTeam.shortName, cat: "Rebounds", line: 10.5, over: -115, under: -115 },
           { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Rebounds", line: 11.5, over: -120, under: -110 },
           { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Rebounds", line: 7.5, over: -110, under: -120 },
-          { player: homeRoster.f, team: game.homeTeam.shortName, cat: "Rebounds", line: 6.5, over: -115, under: -115 }
-        );
-        // 3. Assists (3-4 Players)
-        props.push(
+          { player: homeRoster.f, team: game.homeTeam.shortName, cat: "Rebounds", line: 6.5, over: -115, under: -115 },
           { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "Assists", line: 6.5, over: -115, under: -115 },
           { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "Assists", line: 7.5, over: -110, under: -120 },
           { player: awayRoster.f, team: game.awayTeam.shortName, cat: "Assists", line: 4.5, over: -125, under: -105 },
-          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Assists", line: 5.5, over: -115, under: -115 }
-        );
-        // 4. 3-Pointers Made (3-4 Players)
-        props.push(
+          { player: homeRoster.c, team: game.homeTeam.shortName, cat: "Assists", line: 5.5, over: -115, under: -115 },
           { player: awayRoster.g1, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 3.5, over: +110, under: -140 },
           { player: homeRoster.g1, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -125, under: -105 },
           { player: awayRoster.g2, team: game.awayTeam.shortName, cat: "3-Pointers Made", line: 2.5, over: -115, under: -115 },
           { player: homeRoster.f, team: game.homeTeam.shortName, cat: "3-Pointers Made", line: 1.5, over: -145, under: +115 }
         );
       } else {
-        // EPL SOCCER
-        // 1. Anytime Goalscorer
         props.push(
           { player: awayRoster.f1, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +160, isSingle: true },
           { player: homeRoster.f1, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +140, isSingle: true },
           { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +220, isSingle: true },
-          { player: homeRoster.f2, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +190, isSingle: true }
-        );
-        // 2. Shots on Target
-        props.push(
+          { player: homeRoster.f2, team: game.homeTeam.shortName, cat: "Anytime Goalscorer", line: "Yes", over: +190, isSingle: true },
           { player: awayRoster.f1, team: game.awayTeam.shortName, cat: "Shots on Target", line: 1.5, over: -110, under: -120 },
           { player: homeRoster.f1, team: game.homeTeam.shortName, cat: "Shots on Target", line: 1.5, over: -125, under: -105 },
           { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Shots on Target", line: 0.5, over: -150, under: +115 },
-          { player: homeRoster.m, team: game.homeTeam.shortName, cat: "Shots on Target", line: 0.5, over: -140, under: +110 }
-        );
-        // 3. Assists
-        props.push(
+          { player: homeRoster.m, team: game.homeTeam.shortName, cat: "Shots on Target", line: 0.5, over: -140, under: +110 },
           { player: awayRoster.m, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +190, under: -260 },
           { player: homeRoster.m, team: game.homeTeam.shortName, cat: "Assists", line: 0.5, over: +170, under: -230 },
           { player: awayRoster.f2, team: game.awayTeam.shortName, cat: "Assists", line: 0.5, over: +240, under: -320 }
@@ -698,22 +730,32 @@
       }
     }
 
+    // SWITCH CASINO GAME (BLACKJACK, ROULETTE, SLOTS)
     function switchCasinoGame(game) {
       const bjBox = document.getElementById("blackjackGameBox");
       const rouBox = document.getElementById("rouletteGameBox");
+      const slotBox = document.getElementById("slotsGameBox");
       const tabBj = document.getElementById("tabBlackjackBtn");
       const tabRou = document.getElementById("tabRouletteBtn");
+      const tabSlot = document.getElementById("tabSlotsBtn");
+
+      bjBox.classList.add("hidden");
+      rouBox.classList.add("hidden");
+      slotBox.classList.add("hidden");
+
+      tabBj.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition";
+      tabRou.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition";
+      tabSlot.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 whitespace-nowrap transition";
 
       if (game === 'BLACKJACK') {
         bjBox.classList.remove("hidden");
-        rouBox.classList.add("hidden");
-        tabBj.className = "px-5 py-2.5 rounded-xl font-black text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 transition";
-        tabRou.className = "px-5 py-2.5 rounded-xl font-black text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 transition";
-      } else {
+        tabBj.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 whitespace-nowrap transition";
+      } else if (game === 'ROULETTE') {
         rouBox.classList.remove("hidden");
-        bjBox.classList.add("hidden");
-        tabRou.className = "px-5 py-2.5 rounded-xl font-black text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 transition";
-        tabBj.className = "px-5 py-2.5 rounded-xl font-black text-sm bg-brand-card hover:bg-brand-cardHover border border-brand-border text-slate-300 flex items-center gap-2 transition";
+        tabRou.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-brand-green text-black flex items-center gap-2 shadow-lg shadow-brand-green/20 whitespace-nowrap transition";
+      } else {
+        slotBox.classList.remove("hidden");
+        tabSlot.className = "px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-purple-500 text-white flex items-center gap-2 shadow-lg shadow-purple-500/25 whitespace-nowrap transition";
       }
     }
 
@@ -993,6 +1035,107 @@
     }
 
     // ==========================================
+    // CASINO 3: APEX 777 SLOTS LOGIC
+    // ==========================================
+    const SLOT_SYMBOLS = ["7️⃣", "💎", "🔔", "🍇", "🍒", "🍋"];
+    let slotChip = 25;
+    let slotSpinning = false;
+
+    function setSlotChip(amt) {
+      if (slotSpinning) return;
+      slotChip = amt;
+      document.getElementById("slotBetDisplay").textContent = `$${amt.toFixed(2)}`;
+    }
+
+    function spinSlots() {
+      if (slotSpinning) return;
+      if (userBalance < slotChip) return alert("Insufficient balance! Click + Deposit.");
+
+      userBalance -= slotChip;
+      saveBalance();
+      slotSpinning = true;
+
+      const spinBtn = document.getElementById("slotSpinBtn");
+      spinBtn.disabled = true;
+      spinBtn.className = "w-full sm:w-auto px-10 py-3 rounded-xl font-black text-xs bg-slate-800 text-slate-500 cursor-not-allowed uppercase";
+
+      const r1 = document.getElementById("reel1");
+      const r2 = document.getElementById("reel2");
+      const r3 = document.getElementById("reel3");
+      const statusMsg = document.getElementById("slotStatusMsg");
+
+      r1.classList.add("slot-animate");
+      r2.classList.add("slot-animate");
+      r3.classList.add("slot-animate");
+      statusMsg.textContent = "Rolling reels...";
+
+      // Random reel interval simulation
+      setTimeout(() => {
+        const sym1 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+        r1.innerHTML = `<span>${sym1}</span>`;
+        r1.classList.remove("slot-animate");
+
+        setTimeout(() => {
+          const sym2 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+          r2.innerHTML = `<span>${sym2}</span>`;
+          r2.classList.remove("slot-animate");
+
+          setTimeout(() => {
+            const sym3 = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+            r3.innerHTML = `<span>${sym3}</span>`;
+            r3.classList.remove("slot-animate");
+
+            // Evaluate Win
+            let multiplier = 0;
+            let resultText = "";
+
+            if (sym1 === "7️⃣" && sym2 === "7️⃣" && sym3 === "7️⃣") {
+              multiplier = 50;
+              resultText = "🔥 MEGA JACKPOT! 3x LUCKY 7s (50x)!";
+            } else if (sym1 === "💎" && sym2 === "💎" && sym3 === "💎") {
+              multiplier = 25;
+              resultText = "💎 DIAMOND JACKPOT (25x)!";
+            } else if (sym1 === "🔔" && sym2 === "🔔" && sym3 === "🔔") {
+              multiplier = 15;
+              resultText = "🔔 TRIPLE BELLS (15x)!";
+            } else if (sym1 === "🍇" && sym2 === "🍇" && sym3 === "🍇") {
+              multiplier = 10;
+              resultText = "🍇 TRIPLE GRAPES (10x)!";
+            } else if (sym1 === "🍒" && sym2 === "🍒" && sym3 === "🍒") {
+              multiplier = 5;
+              resultText = "🍒 TRIPLE CHERRIES (5x)!";
+            } else if ((sym1 === "🍒" && sym2 === "🍒") || (sym2 === "🍒" && sym3 === "🍒") || (sym1 === "🍒" && sym3 === "🍒")) {
+              multiplier = 2;
+              resultText = "🍒 TWO CHERRIES (2x)!";
+            }
+
+            if (multiplier > 0) {
+              const winAmt = slotChip * multiplier;
+              userBalance += winAmt;
+              casinoStats.wins++;
+              casinoStats.netProfit += (winAmt - slotChip);
+              statusMsg.textContent = `${resultText} Won +$${winAmt.toFixed(2)}!`;
+              statusMsg.className = "text-center font-black text-sm text-brand-green h-5";
+              showToast("Slots Win!", `Won $${winAmt.toFixed(2)} on Lucky 777 Slots!`);
+            } else {
+              casinoStats.losses++;
+              casinoStats.netProfit -= slotChip;
+              statusMsg.textContent = `No match. -$${slotChip}. Better luck next spin!`;
+              statusMsg.className = "text-center font-black text-sm text-slate-400 h-5";
+            }
+
+            saveBalance();
+            updateStatsDisplay();
+
+            slotSpinning = false;
+            spinBtn.disabled = false;
+            spinBtn.className = "w-full sm:w-auto px-10 py-3 rounded-xl font-black text-xs bg-purple-500 hover:bg-purple-400 text-white uppercase shadow-lg shadow-purple-500/25 transition";
+          }, 400);
+        }, 400);
+      }, 700);
+    }
+
+    // ==========================================
     // SPORTSBOOK API & BETTING LOGIC
     // ==========================================
     async function fetchLiveOdds(isManual = false) {
@@ -1244,7 +1387,6 @@
           <div>
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
               
-              <!-- Teams info & status -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-2 text-xs font-bold">
                   <span class="bg-brand-surface text-slate-300 px-2.5 py-0.5 rounded-full border border-brand-border text-[10px] font-black">${game.sport}</span>
